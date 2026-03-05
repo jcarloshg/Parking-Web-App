@@ -145,7 +145,7 @@ src/
 # Development
 npm run dev
 
-# Testing
+# Testing (see testing/SKILL.md for detailed test commands)
 npm run test
 npm run test -- src/stores/auth.spec.ts
 npm run test:watch
@@ -162,6 +162,212 @@ npm run build
 docker build -t parking-frontend .
 docker run -p 5173:80 parking-frontend
 ```
+
+---
+
+## Testing
+
+> **See also**: [.opencode/skills/testing/SKILL.md](./testing/SKILL.md) for comprehensive testing documentation
+
+### Test Setup
+
+First, ensure vitest and testing dependencies are installed:
+
+```bash
+npm install -D vitest @vue/test-utils jsdom
+```
+
+### Test Configuration (vite.config.ts)
+
+```typescript
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import { fileURLToPath, URL } from 'node:url'
+
+export default defineConfig({
+  plugins: [vue()],
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url))
+    }
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['./tests/setup.ts'],
+    include: ['tests/**/*.{test,spec}.{js,ts}'],
+  },
+})
+```
+
+### Test File Structure
+
+```
+frontend/
+├── tests/
+│   ├── setup.ts                 # Test setup and mocks
+│   ├── stores/
+│   │   ├── auth.spec.ts         # Auth store tests
+│   │   └── parking.spec.ts      # Parking store tests
+│   ├── composables/
+│   │   ├── useParking.spec.ts   # useParking composable tests
+│   │   └── usePayment.spec.ts   # usePayment composable tests
+│   ├── components/
+│   │   ├── Dashboard.spec.ts    # Dashboard component tests
+│   │   ├── ParkingGrid.spec.ts # Parking grid tests
+│   │   ├── StatsCards.spec.ts   # Stats cards tests
+│   │   └── Sidebar.spec.ts     # Sidebar navigation tests
+│   └── views/
+│       ├── Login.spec.ts        # Login view tests
+│       ├── Entry.spec.ts        # Entry view tests
+│       └── Exit.spec.ts         # Exit view tests
+```
+
+### Component Testing Example
+
+```typescript
+import { mount } from '@vue/test-utils'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+import ParkingGrid from '@/views/components/ParkingGrid.vue'
+
+describe('ParkingGrid', () => {
+  const mockSpaces = [
+    { id: 1, number: 'A1', status: 'disponible', type: 'general' },
+    { id: 2, number: 'A2', status: 'ocupado', type: 'general' },
+  ]
+
+  it('renders all parking spaces', () => {
+    const wrapper = mount(ParkingGrid, {
+      props: { spaces: mockSpaces },
+    })
+
+    expect(wrapper.findAll('.parking-space')).toHaveLength(2)
+  })
+
+  it('shows green color for available spaces', () => {
+    const wrapper = mount(ParkingGrid, {
+      props: { spaces: [{ id: 1, number: 'A1', status: 'disponible', type: 'general' }] },
+    })
+
+    expect(wrapper.find('.parking-space').classes()).toContain('status-available')
+  })
+
+  it('shows red color for occupied spaces', () => {
+    const wrapper = mount(ParkingGrid, {
+      props: { spaces: [{ id: 1, number: 'A1', status: 'ocupado', type: 'general' }] },
+    })
+
+    expect(wrapper.find('.parking-space').classes()).toContain('status-occupied')
+  })
+
+  it('displays space number and type', () => {
+    const wrapper = mount(ParkingGrid, {
+      props: { spaces: [{ id: 1, number: 'A1', type: 'eléctrico', status: 'disponible' }] },
+    })
+
+    expect(wrapper.text()).toContain('A1')
+    expect(wrapper.text()).toContain('Eléctrico')
+  })
+})
+```
+
+### Store Testing Example
+
+```typescript
+import { createPinia, setActivePinia } from 'pinia'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { useAuthStore } from '@/stores/auth'
+
+vi.mock('@/api/auth', () => ({
+  authApi: {
+    login: vi.fn().mockResolvedValue({
+      token: 'test-token',
+      user: { id: 1, name: 'Test User', role: 'admin', email: 'test@test.com' },
+    }),
+    logout: vi.fn().mockResolvedValue(undefined),
+  },
+}))
+
+describe('auth store', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+    localStorage.clear()
+  })
+
+  it('login sets user and token', async () => {
+    const store = useAuthStore()
+    
+    await store.login({ email: 'test@test.com', password: 'password' })
+
+    expect(store.token).toBe('test-token')
+    expect(store.user).toEqual(expect.objectContaining({ id: 1, name: 'Test User' }))
+  })
+
+  it('logout clears user and token', async () => {
+    const store = useAuthStore()
+    store.token = 'test-token'
+    store.user = { id: 1, name: 'Test', role: 'admin', email: 'test@test.com' }
+
+    await store.logout()
+
+    expect(store.token).toBeNull()
+    expect(store.user).toBeNull()
+  })
+
+  it('isAdmin returns true for admin role', () => {
+    const store = useAuthStore()
+    store.user = { id: 1, name: 'Admin', role: 'admin', email: 'admin@test.com' }
+
+    expect(store.isAdmin).toBe(true)
+  })
+})
+```
+
+### API Mocking Example
+
+```typescript
+import { vi } from 'vitest'
+
+vi.mock('@/api/parking', () => ({
+  parkingApi: {
+    getAll: vi.fn().mockResolvedValue([
+      { id: 1, number: 'A1', status: 'disponible', type: 'general' },
+    ]),
+    getAvailable: vi.fn().mockResolvedValue([
+      { id: 1, number: 'A1', status: 'disponible', type: 'general' },
+    ]),
+  },
+  reportsApi: {
+    getSummary: vi.fn().mockResolvedValue({
+      cajones_disponibles: 10,
+      tickets_activos: 5,
+      ingresos_dia: 1500,
+    }),
+  },
+}))
+```
+
+### Running Tests
+
+```bash
+# Run all tests
+npm run test
+
+# Run single test file
+npm run test src/views/Dashboard.spec.ts
+
+# Watch mode
+npm run test:watch
+
+# With coverage
+npm run test:coverage
+```
+
+### Test Coverage Targets
+
+- Components: 80%
+- Stores/Composables: 85%
+- Critical Features (Payment, Auth): 90%
 
 ---
 
