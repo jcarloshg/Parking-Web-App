@@ -23,6 +23,7 @@ return new class extends Migration
             $table->dateTime('entry_time');
             $table->dateTime('exit_time')->nullable();
             $table->foreignId('parking_space_id')->constrained('parking_spaces')->onDelete('restrict');
+            $table->foreignId('user_id')->constrained('users')->onDelete('restrict');
             $table->enum('status', ['activo', 'finalizado'])->default('activo');
             $table->timestamps();
         });
@@ -30,6 +31,7 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('ticket_id')->constrained('tickets')->onDelete('restrict');
+            $table->foreignId('user_id')->constrained('users')->onDelete('restrict');
             $table->decimal('total', 10, 2);
             $table->enum('payment_method', ['efectivo', 'tarjeta']);
             $table->dateTime('paid_at');

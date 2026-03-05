@@ -17,6 +17,7 @@ class PaymentFactory extends Factory
             'ticket_id' => Ticket::factory(),
             'total' => fake()->randomFloat(2, 10, 100),
             'payment_method' => fake()->randomElement(['efectivo', 'tarjeta']),
+            'paid_at' => now(),
             'user_id' => User::factory(),
         ];
     }

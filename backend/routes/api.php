@@ -20,12 +20,16 @@ Route::get('parking-spaces/{parkingSpace}', [ParkingSpaceController::class, 'sho
 Route::get('parking-spaces/available', [ParkingSpaceController::class, 'available']);
 Route::get('parking-spaces/available-count', [ParkingSpaceController::class, 'availableCount']);
 
+Route::get('tickets', [TicketController::class, 'index']);
+Route::get('tickets/active', [TicketController::class, 'active']);
+Route::get('tickets/search', [TicketController::class, 'search']);
+Route::get('tickets/{ticket}', [TicketController::class, 'show']);
+Route::get('tickets/{ticket}/calculate', [TicketController::class, 'calculate']);
+
 Route::middleware('auth:api')->group(function () {
     Route::apiResource('parking-spaces', ParkingSpaceController::class)->except(['index', 'show']);
     Route::apiResource('users', UserController::class);
-    Route::get('tickets/active', [TicketController::class, 'active']);
-    Route::get('tickets/search', [TicketController::class, 'search']);
-    Route::get('tickets/{ticket}/calculate', [TicketController::class, 'calculate']);
+    Route::post('tickets', [TicketController::class, 'store']);
     Route::post('tickets/{ticket}/checkout', [TicketController::class, 'checkout']);
     Route::get('reports/daily', [ReportController::class, 'daily']);
     Route::get('reports/monthly', [ReportController::class, 'monthly']);

@@ -242,11 +242,54 @@ DELETE /api/users/{id}
 
 **Issue**: Ruta `/api/parking-spaces/available-count` retorna 404 por conflicto con apiResource
 
-### Phase 5: Tickets
+### Phase 5: Tickets API
 
-- [ ] Crear ticket al ingresar vehículo
-- [ ] Búsqueda de tickets por placa
-- [ ] Cálculo de tiempo y costo
+**Objetivo**: Implementar registro de entradas y salidas de vehículos.
+
+**Tareas completadas**:
+
+1. **TicketController**:
+   - `index()` - Listar tickets (paginado)
+   - `store()` - Crear ticket (entrada de vehículo)
+   - `show()` - Ver ticket específico
+   - `active()` - Listar tickets activos
+   - `search()` - Buscar por placa
+   - `calculate()` - Calcular costo
+   - `checkout()` - Registrar salida y pago
+
+2. **TicketService**:
+   - Lógica de negocio separada
+   - Métodos: getAll(), getById(), getActive(), searchByPlate(), create(), calculateFee(), checkout()
+   - Asignación automática de cajón
+   - Cambio de status del cajón (disponible → ocupado → disponible)
+
+3. **Rutas API**:
+   ```
+   GET    /api/tickets                 # Listar (público)
+   POST   /api/tickets                 # Crear ticket (Auth)
+   GET    /api/tickets/{id}           # Ver ticket (público)
+   GET    /api/tickets/active         # Tickets activos
+   GET    /api/tickets/search?plate=  # Buscar por placa
+   GET    /api/tickets/{id}/calculate # Calcular costo
+   POST   /api/tickets/{id}/checkout  # Registrar salida
+   ```
+
+4. **Validaciones**:
+   - plate_number: required|string|regex:/^[A-Z0-9-]+$/i
+   - vehicle_type: required|in:auto,moto,camioneta
+   - parking_space_id: required|exists:parking_spaces,id
+
+5. **Tests**:
+   - TicketApiTest (12 casos - 10 passing)
+   - TicketServiceTest (11 casos)
+
+**Entregables**:
+- Registro de entrada funcionando
+- Búsqueda de tickets por placa
+- Tickets activos listados
+- Cajón marcado como ocupado
+- Cálculo de tarifa por hora
+- Checkout con registro de pago
 
 ### Phase 6: Pagos
 

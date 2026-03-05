@@ -2,127 +2,100 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ParkingSpace;
 use App\Models\Ticket;
-use App\Models\Payment;
+use App\Services\TicketService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
+use Illuminate\Http\JsonResponse;
 
 class TicketController extends Controller
 {
-    public function index()
+    public function __construct(
+        private TicketService $ticketService
+    ) {}
+
+    public function index(Request $request)
     {
-        return response()->json(Ticket::with(['parkingSpace', 'user'])->get());
+        $perPage = $request->get('per_page', 15);
+        $tickets = $this->ticketService->getAll($perPage);
+        
+        return response()->json($tickets);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'plate_number' => 'required|string|regex:/^[A-Z0-9-]+$/i|max:20',
+            'vehicle_type' => 'required|in:auto,moto,camioneta',
             'parking_space_id' => 'required|exists:parking_spaces,id',
-            'vehicle_plate' => 'required|string|max:20',
-            'vehicle_model' => 'nullable|string|max:50',
-            'vehicle_color' => 'nullable|string|max:30',
         ]);
 
-        $space = ParkingSpace::findOrFail($validated['parking_space_id']);
-        
-        if ($space->status !== 'available') {
-            return response()->json(['error' => 'Parking space is not available'], 400);
-        }
+        $user = $request->user();
+        $ticket = $this->ticketService->create($validated, $user->id);
 
-        $ticket = Ticket::create([
-            'ticket_number' => 'TKT-' . strtoupper(Str::random(8)),
-            'parking_space_id' => $validated['parking_space_id'],
-            'vehicle_plate' => strtoupper($validated['vehicle_plate']),
-            'vehicle_model' => $validated['vehicle_model'] ?? null,
-            'vehicle_color' => $validated['vehicle_color'] ?? null,
-            'entry_time' => now(),
-            'status' => 'active',
-            'user_id' => Auth::id(),
-        ]);
-
-        $space->update(['status' => 'occupied']);
-
-        return response()->json($ticket, 201);
+        return response()->json(['data' => $ticket], 201);
     }
 
     public function show(Ticket $ticket)
     {
-        return response()->json($ticket->load(['parkingSpace', 'user', 'payments']));
+        $ticket = $this->ticketService->getById($ticket->id);
+        return response()->json(['data' => $ticket]);
     }
 
-    public function active()
+    public function active(Request $request)
     {
-        $tickets = Ticket::with('parkingSpace')
-            ->where('status', 'active')
-            ->get();
+        $perPage = $request->get('per_page', 15);
+        $tickets = $this->ticketService->getActive($perPage);
+        
         return response()->json($tickets);
     }
 
     public function search(Request $request)
     {
-        $query = $request->get('q');
-        
-        $tickets = Ticket::with('parkingSpace')
-            ->where('vehicle_plate', 'like', "%{$query}%")
-            ->orWhere('ticket_number', 'like', "%{$query}%")
-            ->get();
+        $request->validate([
+            'plate' => 'required|string|min:1|max:20',
+        ]);
 
+        $perPage = $request->get('per_page', 15);
+        $tickets = $this->ticketService->searchByPlate($request->plate, $perPage);
+        
         return response()->json($tickets);
     }
 
     public function calculate(Ticket $ticket)
     {
-        $hours = now()->diffInMinutes($ticket->entry_time) / 60;
-        $hours = max(1, ceil($hours));
-        $rate = $ticket->parkingSpace->hourly_rate;
-        $total = $hours * $rate;
+        $ticket = $this->ticketService->getById($ticket->id);
+        
+        if (!$ticket) {
+            return response()->json(['error' => 'Ticket no encontrado'], 404);
+        }
 
-        return response()->json([
-            'hours' => $hours,
-            'hourly_rate' => $rate,
-            'total_amount' => $total,
-        ]);
+        if ($ticket->status !== 'activo') {
+            return response()->json(['error' => 'El ticket ya está finalizado'], 400);
+        }
+
+        $feeData = $this->ticketService->calculateFee($ticket);
+        
+        return response()->json(['data' => $feeData]);
     }
 
     public function checkout(Request $request, Ticket $ticket)
     {
         $validated = $request->validate([
-            'method' => 'required|in:cash,card,qr',
+            'payment_method' => 'required|in:efectivo,tarjeta',
         ]);
 
-        $hours = now()->diffInMinutes($ticket->entry_time) / 60;
-        $hours = max(1, ceil($hours));
-        $rate = $ticket->parkingSpace->hourly_rate;
-        $total = $hours * $rate;
+        $ticket = $this->ticketService->getById($ticket->id);
+        
+        if (!$ticket) {
+            return response()->json(['error' => 'Ticket no encontrado'], 404);
+        }
 
-        $ticket->update([
-            'exit_time' => now(),
-            'status' => 'completed',
-            'total_amount' => $total,
-        ]);
+        if ($ticket->status !== 'activo') {
+            return response()->json(['error' => 'El ticket ya está finalizado'], 400);
+        }
 
-        $ticket->parkingSpace->update(['status' => 'available']);
-
-        $payment = Payment::create([
-            'ticket_id' => $ticket->id,
-            'amount' => $total,
-            'method' => $validated['method'],
-            'transaction_id' => 'TXN-' . strtoupper(Str::random(12)),
-            'payment_time' => now(),
-            'user_id' => Auth::id(),
-        ]);
-
-        return response()->json([
-            'ticket' => $ticket->fresh(),
-            'payment' => $payment,
-        ]);
-    }
-
-    public function destroy(Ticket $ticket)
-    {
-        $ticket->delete();
-        return response()->json(null, 204);
+        $ticket = $this->ticketService->checkout($ticket, $validated['payment_method']);
+        
+        return response()->json(['data' => $ticket]);
     }
 }
