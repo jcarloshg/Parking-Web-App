@@ -50,7 +50,9 @@ curl http://localhost:80
 
 ```
 POST /api/auth/login
+POST /api/auth/register
 POST /api/auth/logout
+POST /api/auth/refresh
 GET  /api/auth/me
 
 GET    /api/parking-spaces
@@ -151,9 +153,47 @@ DELETE /api/users/{id}
 
 ### Phase 3: Autenticación JWT
 
-- [ ] Implementar login/logout con JWT
-- [ ] Middleware de autenticación
-- [ ] Rutas protegidas
+**Objetivo**: Implementar autenticación con JWT usando tymon/jwt-auth.
+
+**Tareas completadas**:
+
+1. **Configuración JWT**:
+   - TTL configurado (60 min)
+   - Refresh TTL configurado (20160 min)
+   - JWT secret generado
+
+2. **AuthController**:
+   - `login()` - retorna token con datos del usuario
+   - `register()` - crea usuario y retorna token
+   - `logout()` - invalida el token
+   - `refresh()` - genera nuevo token
+   - `me()` - retorna usuario actual
+
+3. **Rutas API**:
+   ```
+   POST /api/auth/login
+   POST /api/auth/register
+   POST /api/auth/logout
+   POST /api/auth/refresh
+   GET  /api/auth/me
+   ```
+
+4. **Middleware**:
+   - Using `auth:api` guard (JWT)
+
+5. **AuthService**:
+   - Created `app/Services/AuthService.php`
+
+6. **Tests**:
+   - AuthApiTest (10 test cases)
+   - AuthServiceTest (7 test cases)
+
+**Entregables**:
+- Endpoints de autenticación funcionando
+- JWT token generado y validado
+- Logout y refresh token implementados
+
+---
 
 ### Phase 4: Gestión de Espacios
 
