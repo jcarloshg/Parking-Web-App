@@ -1,0 +1,27 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ParkingSpaceController;
+use App\Http\Controllers\TicketController;
+use App\Http\Controllers\ReportController;
+
+Route::prefix('auth')->group(function () {
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:api');
+    Route::get('/me', [AuthController::class, 'me'])->middleware('auth:api');
+});
+
+Route::middleware('auth:api')->group(function () {
+    Route::apiResource('users', UserController::class);
+    Route::apiResource('parking-spaces', ParkingSpaceController::class);
+    Route::get('parking-spaces/available-count', [ParkingSpaceController::class, 'availableCount']);
+    Route::apiResource('tickets', TicketController::class);
+    Route::get('tickets/active', [TicketController::class, 'active']);
+    Route::get('tickets/search', [TicketController::class, 'search']);
+    Route::get('tickets/{ticket}/calculate', [TicketController::class, 'calculate']);
+    Route::post('tickets/{ticket}/checkout', [TicketController::class, 'checkout']);
+    Route::get('reports/daily', [ReportController::class, 'daily']);
+    Route::get('reports/monthly', [ReportController::class, 'monthly']);
+});
