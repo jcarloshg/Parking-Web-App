@@ -14,11 +14,13 @@ class Payment extends Model
         'ticket_id',
         'total',
         'payment_method',
+        'paid_at',
         'user_id',
     ];
 
     protected $casts = [
         'total' => 'decimal:2',
+        'paid_at' => 'datetime',
     ];
 
     public function ticket(): BelongsTo
