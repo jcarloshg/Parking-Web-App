@@ -14,31 +14,40 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $admin = User::create([
-            'name' => 'Admin User',
+            'name' => 'Administrador',
             'email' => 'admin@parking.com',
             'password' => bcrypt('password'),
             'role' => 'admin',
-            'is_active' => true,
         ]);
 
-        $attendant = User::create([
-            'name' => 'Cajero',
-            'email' => 'attendant@parking.com',
+        $cajero = User::create([
+            'name' => 'Cajero Principal',
+            'email' => 'cajero@parking.com',
             'password' => bcrypt('password'),
             'role' => 'cajero',
-            'is_active' => true,
+        ]);
+
+        $supervisor = User::create([
+            'name' => 'Supervisor',
+            'email' => 'supervisor@parking.com',
+            'password' => bcrypt('password'),
+            'role' => 'supervisor',
         ]);
 
         $spaces = [
-            ['number' => 'A1', 'type' => 'general'],
-            ['number' => 'A2', 'type' => 'general'],
-            ['number' => 'A3', 'type' => 'general'],
-            ['number' => 'A4', 'type' => 'general'],
-            ['number' => 'B1', 'type' => 'general'],
-            ['number' => 'B2', 'type' => 'general'],
-            ['number' => 'E1', 'type' => 'eléctrico'],
-            ['number' => 'E2', 'type' => 'eléctrico'],
-            ['number' => 'D1', 'type' => 'discapacitado'],
+            ['number' => 'A1', 'type' => 'general', 'status' => 'disponible'],
+            ['number' => 'A2', 'type' => 'general', 'status' => 'disponible'],
+            ['number' => 'A3', 'type' => 'general', 'status' => 'disponible'],
+            ['number' => 'A4', 'type' => 'general', 'status' => 'disponible'],
+            ['number' => 'A5', 'type' => 'general', 'status' => 'disponible'],
+            ['number' => 'B1', 'type' => 'general', 'status' => 'disponible'],
+            ['number' => 'B2', 'type' => 'general', 'status' => 'disponible'],
+            ['number' => 'B3', 'type' => 'general', 'status' => 'disponible'],
+            ['number' => 'B4', 'type' => 'general', 'status' => 'disponible'],
+            ['number' => 'E1', 'type' => 'eléctrico', 'status' => 'disponible'],
+            ['number' => 'E2', 'type' => 'eléctrico', 'status' => 'disponible'],
+            ['number' => 'D1', 'type' => 'discapacitado', 'status' => 'disponible'],
+            ['number' => 'D2', 'type' => 'discapacitado', 'status' => 'disponible'],
         ];
 
         foreach ($spaces as $space) {

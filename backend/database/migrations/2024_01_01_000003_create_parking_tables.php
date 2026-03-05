@@ -8,42 +8,31 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->enum('role', ['admin', 'attendant'])->default('attendant')->after('email');
-        });
-
         Schema::create('parking_spaces', function (Blueprint $table) {
             $table->id();
-            $table->string('space_number')->unique();
-            $table->enum('type', ['standard', 'compact', 'electric', 'disabled']);
-            $table->enum('status', ['available', 'occupied', 'maintenance'])->default('available');
-            $table->decimal('hourly_rate', 8, 2);
+            $table->string('number', 10)->unique();
+            $table->enum('type', ['general', 'discapacitado', 'eléctrico']);
+            $table->enum('status', ['disponible', 'ocupado', 'fuera_servicio'])->default('disponible');
             $table->timestamps();
         });
 
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
-            $table->string('ticket_number')->unique();
-            $table->foreignId('parking_space_id')->constrained();
-            $table->string('vehicle_plate', 20);
-            $table->string('vehicle_model', 50)->nullable();
-            $table->string('vehicle_color', 30)->nullable();
-            $table->timestamp('entry_time');
-            $table->timestamp('exit_time')->nullable();
-            $table->enum('status', ['active', 'completed', 'cancelled'])->default('active');
-            $table->decimal('total_amount', 10, 2)->nullable();
-            $table->foreignId('user_id')->constrained();
+            $table->string('plate_number', 20);
+            $table->enum('vehicle_type', ['auto', 'moto', 'camioneta']);
+            $table->dateTime('entry_time');
+            $table->dateTime('exit_time')->nullable();
+            $table->foreignId('parking_space_id')->constrained('parking_spaces')->onDelete('restrict');
+            $table->enum('status', ['activo', 'finalizado'])->default('activo');
             $table->timestamps();
         });
 
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('ticket_id')->constrained();
-            $table->decimal('amount', 10, 2);
-            $table->enum('method', ['cash', 'card', 'qr']);
-            $table->string('transaction_id')->unique();
-            $table->timestamp('payment_time');
-            $table->foreignId('user_id')->constrained();
+            $table->foreignId('ticket_id')->constrained('tickets')->onDelete('restrict');
+            $table->decimal('total', 10, 2);
+            $table->enum('payment_method', ['efectivo', 'tarjeta']);
+            $table->dateTime('paid_at');
             $table->timestamps();
         });
     }
@@ -53,8 +42,5 @@ return new class extends Migration
         Schema::dropIfExists('payments');
         Schema::dropIfExists('tickets');
         Schema::dropIfExists('parking_spaces');
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('role');
-        });
     }
 };
