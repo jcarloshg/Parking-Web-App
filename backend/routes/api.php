@@ -17,15 +17,15 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::get('parking-spaces', [ParkingSpaceController::class, 'index']);
-Route::get('parking-spaces/{parkingSpace}', [ParkingSpaceController::class, 'show']);
 Route::get('parking-spaces/available', [ParkingSpaceController::class, 'available']);
 Route::get('parking-spaces/available-count', [ParkingSpaceController::class, 'availableCount']);
+Route::get('parking-spaces/{parkingSpace}', [ParkingSpaceController::class, 'show']);
 
 Route::get('tickets', [TicketController::class, 'index']);
 Route::get('tickets/active', [TicketController::class, 'active']);
 Route::get('tickets/search', [TicketController::class, 'search']);
-Route::get('tickets/{ticket}', [TicketController::class, 'show']);
 Route::get('tickets/{ticket}/calculate', [TicketController::class, 'calculate']);
+Route::get('tickets/{ticket}', [TicketController::class, 'show']);
 
 Route::get('payments', [PaymentController::class, 'index']);
 Route::get('payments/today', [PaymentController::class, 'today']);
