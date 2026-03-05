@@ -15,7 +15,7 @@ export interface ReportSummary {
   ingresos_dia: number
   ultimos_tickets?: Array<{
     id: number
-    plate: string
+    plate_number: string
     vehicle_type: string
     entry_time: string
     parking_space?: {

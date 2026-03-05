@@ -1,126 +1,191 @@
 <template>
-  <div class="exit-page">
-    <div class="page-header">
-      <h1>Registro de Salida</h1>
-      <p class="subtitle">Busque el ticket del vehículo</p>
-    </div>
-
-    <div v-if="!ticket" class="search-container">
-      <form @submit.prevent="handleSearch" class="search-form">
-        <div class="search-row">
-          <PlateInput
-            v-model="searchPlate"
-            placeholder="ABC-1234"
-            test-id="search-input"
-          />
-          <button
-            type="submit"
-            class="search-button"
-            :disabled="loading || !searchPlate"
-            data-testid="search-btn"
-          >
-            {{ loading ? 'Buscando...' : 'Buscar' }}
-          </button>
-        </div>
-      </form>
-
-      <div v-if="error" class="error-message">
-        {{ error }}
+  <div class="dashboard-layout">
+    <aside class="sidebar">
+      <div class="logo">
+        <h2>Parking</h2>
       </div>
+      <nav class="nav-menu">
+        <router-link to="/dashboard" class="nav-item" :class="{ active: $route.path === '/dashboard' }">
+          <span class="icon">📊</span>
+          Dashboard
+        </router-link>
+        <router-link to="/entry" class="nav-item" :class="{ active: $route.path === '/entry' }">
+          <span class="icon">🚗</span>
+          Entrada
+        </router-link>
+        <router-link to="/exit" class="nav-item" :class="{ active: $route.path === '/exit' }">
+          <span class="icon">🚙</span>
+          Salida
+        </router-link>
+        <router-link v-if="canViewReports" to="/reports" class="nav-item" :class="{ active: $route.path === '/reports' }">
+          <span class="icon">📈</span>
+          Reportes
+        </router-link>
+        <router-link v-if="isAdmin" to="/admin" class="nav-item" :class="{ active: $route.path === '/admin' }">
+          <span class="icon">⚙️</span>
+          Admin
+        </router-link>
+      </nav>
+    </aside>
 
-      <div v-if="notFound" class="not-found-message">
-        No se encontró ningún ticket con esa placa
-      </div>
-    </div>
+    <div class="main-content">
+      <header class="header">
+        <h1>Registro de Salida</h1>
+        <div class="user-info" v-if="authStore.user">
+          <span class="user-name">{{ userName }}</span>
+          <span class="user-role">{{ userRole }}</span>
+          <button @click="handleLogout" class="logout-btn">Cerrar Sesión</button>
+        </div>
+      </header>
 
-    <div v-else-if="!paymentSuccess" class="payment-container">
-      <TicketCard
-        :ticket="ticket"
-        :show-total="true"
-        :total="calculation?.total ?? null"
-        test-id="found-ticket"
-      />
+      <main class="content">
+        <div class="exit-page">
+          <div class="page-header">
+            <p class="subtitle">Busque el ticket del vehículo</p>
+          </div>
 
-      <div v-if="calculation" class="calculation-details">
-        <h3>Detalle del cálculo</h3>
-        <div class="detail-row">
-          <span>Tiempo:</span>
-          <span>{{ calculation.hours }} hora(s)</span>
-        </div>
-        <div class="detail-row">
-          <span>Tarifa:</span>
-          <span>${{ calculation.rate.toFixed(2) }}</span>
-        </div>
-        <div class="detail-row total">
-          <span>Total:</span>
-          <span>${{ calculation.total.toFixed(2) }}</span>
-        </div>
-      </div>
+          <div v-if="!ticket" class="search-container">
+            <form @submit.prevent="handleSearch" class="search-form">
+              <div class="search-row">
+                <PlateInput
+                  v-model="searchPlate"
+                  placeholder="ABC-1234"
+                  test-id="search-input"
+                />
+                <button
+                  type="submit"
+                  class="search-button"
+                  :disabled="loading || !searchPlate"
+                  data-testid="search-btn"
+                >
+                  {{ loading ? 'Buscando...' : 'Buscar' }}
+                </button>
+              </div>
+            </form>
 
-      <div v-else class="calculating">
-        Calculando tarifa...
-      </div>
+            <div v-if="error" class="error-message">
+              {{ error }}
+            </div>
 
-      <PaymentForm
-        v-model="paymentMethod"
-        :disabled="paymentLoading"
-        :error="paymentError"
-        button-text="Pagar y Salir"
-        button-test-id="pay-btn"
-        @submit="handlePayment"
-      />
-    </div>
+            <div v-if="notFound" class="not-found-message">
+              No se encontró ningún ticket con esa placa
+            </div>
+          </div>
 
-    <div v-else class="receipt-container">
-      <div class="success-icon">✓</div>
-      <h2>Pago Exitoso</h2>
+          <div v-else-if="!paymentSuccess" class="payment-container">
+            <TicketCard
+              :ticket="ticket"
+              :show-total="true"
+              :total="calculation?.total ?? null"
+              test-id="found-ticket"
+            />
 
-      <div class="receipt">
-        <h3>Comprobante de Pago</h3>
-        <div class="receipt-row">
-          <span>Ticket #:</span>
-          <span>{{ ticket.id }}</span>
-        </div>
-        <div class="receipt-row">
-          <span>Placa:</span>
-          <span>{{ ticket.plate_number }}</span>
-        </div>
-        <div class="receipt-row">
-          <span>Entrada:</span>
-          <span>{{ formatDateTime(ticket.entry_time) }}</span>
-        </div>
-        <div class="receipt-row">
-          <span>Salida:</span>
-          <span>{{ formatDateTime(paymentData?.payment_time || new Date().toISOString()) }}</span>
-        </div>
-        <div class="receipt-row">
-          <span>Método:</span>
-          <span>{{ paymentMethod === 'efectivo' ? 'Efectivo' : 'Tarjeta' }}</span>
-        </div>
-        <div class="receipt-row total">
-          <span>Total:</span>
-          <span>${{ paymentData?.amount.toFixed(2) || calculation?.total.toFixed(2) }}</span>
-        </div>
-      </div>
+            <div v-if="calculation" class="calculation-details">
+              <h3>Detalle del cálculo</h3>
+              <div class="detail-row">
+                <span>Tiempo:</span>
+                <span>{{ calculation.hours }} hora(s)</span>
+              </div>
+              <div class="detail-row">
+                <span>Tarifa:</span>
+                <span>${{ calculation.rate.toFixed(2) }}</span>
+              </div>
+              <div class="detail-row total">
+                <span>Total:</span>
+                <span>${{ calculation.total.toFixed(2) }}</span>
+              </div>
+            </div>
 
-      <button
-        type="button"
-        class="reset-button"
-        @click="resetForm"
-      >
-        Procesar Otra Salida
-      </button>
+            <div v-else class="calculating">
+              Calculando tarifa...
+            </div>
+
+            <PaymentForm
+              v-model="paymentMethod"
+              :disabled="paymentLoading"
+              :error="paymentError"
+              button-text="Pagar y Salir"
+              button-test-id="pay-btn"
+              @submit="handlePayment"
+            />
+          </div>
+
+          <div v-else class="receipt-container">
+            <div class="success-icon">✓</div>
+            <h2>Pago Exitoso</h2>
+
+            <div class="receipt">
+              <h3>Comprobante de Pago</h3>
+              <div class="receipt-row">
+                <span>Ticket #:</span>
+                <span>{{ ticket.id }}</span>
+              </div>
+              <div class="receipt-row">
+                <span>Placa:</span>
+                <span>{{ ticket.plate_number }}</span>
+              </div>
+              <div class="receipt-row">
+                <span>Entrada:</span>
+                <span>{{ formatDateTime(ticket.entry_time) }}</span>
+              </div>
+              <div class="receipt-row">
+                <span>Salida:</span>
+                <span>{{ formatDateTime(paymentData?.payment_time || new Date().toISOString()) }}</span>
+              </div>
+              <div class="receipt-row">
+                <span>Método:</span>
+                <span>{{ paymentMethod === 'efectivo' ? 'Efectivo' : 'Tarjeta' }}</span>
+              </div>
+              <div class="receipt-row total">
+                <span>Total:</span>
+                <span>${{ paymentData?.amount.toFixed(2) || calculation?.total.toFixed(2) }}</span>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              class="reset-button"
+              @click="resetForm"
+            >
+              Procesar Otra Salida
+            </button>
+          </div>
+        </div>
+      </main>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import { ticketsApi, type Ticket, type TicketCalculation } from '@/api/tickets'
 import { paymentsApi, type Payment } from '@/api/payments'
 import PlateInput from '@/components/PlateInput.vue'
 import TicketCard from '@/components/TicketCard.vue'
 import PaymentForm from '@/components/PaymentForm.vue'
+
+const router = useRouter()
+const authStore = useAuthStore()
+
+const isAdmin = computed(() => authStore.user?.role === 'admin')
+const canViewReports = computed(() => authStore.user?.role === 'admin' || authStore.user?.role === 'supervisor')
+const userName = computed(() => authStore.user?.name ?? 'Usuario')
+const userRole = computed(() => {
+  if (!authStore.user) return ''
+  const roles: Record<string, string> = {
+    admin: 'Administrador',
+    cajero: 'Cajero',
+    supervisor: 'Supervisor'
+  }
+  return roles[authStore.user.role] ?? authStore.user.role
+})
+
+const handleLogout = async () => {
+  await authStore.logout()
+  router.push('/login')
+}
 
 const searchPlate = ref('')
 const loading = ref(false)
@@ -411,5 +476,126 @@ h2 {
 
 .reset-button:hover {
   background-color: #5a6268;
+}
+
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f3f4f6;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: #1f2937;
+  color: white;
+  padding: 1rem 0;
+}
+
+.sidebar .logo {
+  padding: 1rem;
+  border-bottom: 1px solid #374151;
+}
+
+.sidebar .logo h2 {
+  margin: 0;
+  color: #60a5fa;
+}
+
+.nav-menu {
+  padding: 1rem 0;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  color: #d1d5db;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.nav-item:hover {
+  background-color: #374151;
+}
+
+.nav-item.active {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.nav-item .icon {
+  margin-right: 0.5rem;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: white;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-name {
+  font-weight: 500;
+}
+
+.user-role {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.logout-btn {
+  padding: 0.5rem 1rem;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background-color: #dc2626;
+}
+
+.content {
+  flex: 1;
+  padding: 2rem;
+}
+
+.exit-page {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: #666;
 }
 </style>

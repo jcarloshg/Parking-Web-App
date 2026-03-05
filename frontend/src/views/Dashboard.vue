@@ -93,7 +93,7 @@
               </thead>
               <tbody>
                 <tr v-for="ticket in validTickets" :key="ticket.id">
-                  <td>{{ ticket.plate }}</td>
+                  <td>{{ ticket.plate_number }}</td>
                   <td>{{ ticket.vehicle_type }}</td>
                   <td>{{ ticket.parking_space?.number ?? '-' }}</td>
                   <td>{{ formatDate(ticket.entry_time) }}</td>
