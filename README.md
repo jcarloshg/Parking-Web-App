@@ -10,7 +10,6 @@ parking-web-app/
 ├── frontend/         # Vue.js 3 SPA
 ├── database/         # MySQL 8.0
 ├── docker-compose.yml
-├── DOCS/            # Documentación de fases
 └── README.md
 ```
 
@@ -20,6 +19,7 @@ parking-web-app/
 - **Frontend**: Vue.js 3 + TypeScript + Vite
 - **Database**: MySQL 8.0
 - **Auth**: JWT (tymon/jwt-auth)
+- **State Management**: Pinia
 - **Container**: Docker
 
 ## Quick Start
@@ -31,12 +31,23 @@ docker compose up -d
 # Verificar estado
 docker compose ps
 
-# Acceder al backend
+# Acceder al backend (API)
 curl http://localhost:8000
 
-# Acceder al frontend
+# Acceder al frontend (Vite dev server)
 curl http://localhost:5173
+
+# Acceder al frontend (Production)
+# El frontend en producción corre en nginx en el puerto 80
 ```
+
+## Puertos
+
+| Servicio | Puerto |
+| -------- | ------ |
+| Backend  | 8000   |
+| Frontend | 5173   |
+| Database | 3306   |
 
 ## Credenciales de Prueba
 
@@ -46,7 +57,15 @@ curl http://localhost:5173
 | Cajero     | cajero@parking.com     | password |
 | Supervisor | supervisor@parking.com | password |
 
+## Roles y Permisos
+
+- **Admin**: Acceso completo (CRUD usuarios, espacios, reportes)
+- **Cajero**: Registro de entrada/salida, pagos
+- **Supervisor**: Ver reportes, registro de entrada/salida
+
 ## API Endpoints
+
+### Autenticación
 
 ```
 POST /api/auth/login
@@ -54,34 +73,84 @@ POST /api/auth/register
 POST /api/auth/logout
 POST /api/auth/refresh
 GET  /api/auth/me
+```
 
-GET    /api/parking-spaces
-POST   /api/parking-spaces
-GET    /api/parking-spaces/available-count
+### Espacios de Estacionamiento
 
-POST   /api/tickets
-GET    /api/tickets/active
-GET    /api/tickets/search?q=
-GET    /api/tickets/{id}/calculate
-POST   /api/tickets/{id}/checkout
+```
+GET    /api/parking-spaces              # Listar todos (público)
+GET    /api/parking-spaces/available     # Espacios disponibles
+GET    /api/parking-spaces/available-count  # Conteo disponibles
+GET    /api/parking-spaces/{id}         # Ver espacio
+POST   /api/parking-spaces              # Crear (Admin)
+PUT    /api/parking-spaces/{id}         # Actualizar (Admin)
+DELETE /api/parking-spaces/{id}         # Eliminar (Admin)
+```
 
-GET    /api/payments
-POST   /api/payments
-GET    /api/payments/calculate/{ticket_id}
+### Tickets
 
-GET    /api/reports/daily
-GET    /api/reports/monthly
-GET    /api/reports/summary
+```
+GET    /api/tickets                     # Listar todos
+GET    /api/tickets/active             # Tickets activos
+GET    /api/tickets/search?plate=      # Buscar por placa
+GET    /api/tickets/{id}               # Ver ticket
+GET    /api/tickets/{id}/calculate     # Calcular tarifa
+POST   /api/tickets                    # Crear ticket (entrada)
+POST   /api/tickets/{id}/checkout      # Checkout (salida)
+```
 
-GET    /api/users
-POST   /api/users
-PUT    /api/users/{id}
-DELETE /api/users/{id}
+### Pagos
+
+```
+GET    /api/payments                   # Listar pagos
+GET    /api/payments/today             # Pagos de hoy
+GET    /api/payments/{id}              # Ver pago
+GET    /api/payments/calculate/{ticket_id}  # Calcular tarifa
+POST   /api/payments                   # Registrar pago
+```
+
+### Reportes
+
+```
+GET /api/reports/summary    # Dashboard summary (público)
+GET /api/reports/daily      # Reporte diario (Admin/Supervisor)
+GET /api/reports/monthly    # Reporte mensual (Admin/Supervisor)
+```
+
+### Usuarios
+
+```
+GET    /api/users           # Listar usuarios
+POST   /api/users           # Crear usuario
+GET    /api/users/{id}      # Ver usuario
+PUT    /api/users/{id}      # Actualizar usuario
+DELETE /api/users/{id}      # Eliminar usuario
 ```
 
 ---
 
-## Work Flow
+## Frontend - Vistas
+
+| Ruta       | Descripción                     |
+| ---------- | ------------------------------- |
+| /login     | Inicio de sesión                |
+| /dashboard | Dashboard con stats y cajones   |
+| /entry     | Registro de entrada de vehículo |
+| /exit      | Registro de salida y pago       |
+| /reports   | Reportes (Admin/Supervisor)     |
+| /admin     | Administración (Admin)          |
+
+## Frontend - Componentes
+
+- **PlateInput**: Input para placa de vehículo (mayúsculas automáticas)
+- **VehicleSelect**: Selector de tipo de vehículo
+- **ParkingSpaceSelect**: Selector de cajón disponible
+- **PaymentForm**: Formulario de pago
+- **TicketCard**: Tarjeta de ticket con detalles
+
+---
+
+## Fases de Desarrollo
 
 ### Phase 1: Setup y Configuración
 
@@ -244,8 +313,6 @@ DELETE /api/users/{id}
 - Endpoints funcionando con paginación
 - Políticas de acceso por rol
 - Tests passing
-
-**Issue**: Ruta `/api/parking-spaces/available-count` retorna 404 por conflicto con apiResource
 
 ### Phase 5: Tickets API
 
@@ -475,7 +542,7 @@ DELETE /api/users/{id}
 1. **Dashboard Layout**:
    - Sidebar con navegación
    - Header con usuario y logout
-   - Stats cards: Ingresos del día, Tickets activos, Cajones disponibles
+   - Stats cards: Ingresos del Día, Tickets activos, Cajones disponibles
 
 2. **Parking Grid**:
    - Visualización de todos los cajones
@@ -484,12 +551,13 @@ DELETE /api/users/{id}
 
 3. **Últimos Tickets**:
    - Tabla con últimos 5 tickets activos
-   - Placa, tipo, cajón, hora de entrada
+   - Placa, tipo, cajón, hora de entrada, hora de salida
+   - Tickets sin pagar primero, luego pagados
 
 4. **Auto-refresh**:
    - Actualización cada 30 segundos
 
-**Archivos creados**:
+**Archivos creados/actualizados**:
 - frontend/src/views/Dashboard.vue
 - frontend/src/api/parking.ts (reportsApi)
 - frontend/src/api/reports.ts
@@ -497,7 +565,7 @@ DELETE /api/users/{id}
 **Entregables**:
 - Dashboard con stats en tiempo real
 - Grid visual de cajones
-- Tabla de últimos tickets
+- Tabla de últimos tickets con hora de salida
 - Auto-refresh funcionando
 
 ---
@@ -518,6 +586,7 @@ DELETE /api/users/{id}
    - Llamar POST /api/tickets
    - Mostrar ticket generado (número, hora entrada)
    - Mensaje de éxito/error
+   - Layout con sidebar
 
 2. **Exit Page (Registro de Salida)**:
    - Buscador por placa
@@ -531,6 +600,7 @@ DELETE /api/users/{id}
    - Botón "Pagar y Salir"
    - Llamar POST /api/payments
    - Mostrar comprobante
+   - Layout con sidebar
 
 3. **Components creados**:
    - PlateInput.vue (mayúsculas automáticas)
@@ -551,16 +621,17 @@ DELETE /api/users/{id}
 - Búsqueda de ticket por placa
 - Cálculo y pago de tarifa
 - Comprobante de pago
+- Sidebar en todas las páginas
 
 ---
 
-### Phase 11: Frontend - Reportes
+### Phase 11: Frontend - Reportes (pendiente)
 
 - [ ] Reporte diario con filtros de fecha
 - [ ] Reporte mensual con gráficos
 - [ ] Exportación a PDF/Excel
 
-### Phase 12: Frontend - Administración
+### Phase 12: Frontend - Administración (pendiente)
 
 - [ ] Gestión de usuarios (CRUD)
 - [ ] Gestión de espacios (CRUD)
@@ -587,6 +658,20 @@ DELETE /api/users/{id}
 - [x] TicketCard.spec.ts
 - [x] EntryPage.spec.ts
 - [x] ExitPage.spec.ts
+
+---
+
+## Tarifas
+
+| Tipo      | Por hora | Por día |
+| --------- | -------- | ------- |
+| Auto      | $20      | $150    |
+| Moto      | $10      | $80     |
+| Camioneta | $30      | $200    |
+
+- Tolerancia: 10 minutos = $0
+- Cobro por hora completa
+- Tarifa diaria después de 24h
 
 ---
 
@@ -622,7 +707,7 @@ docker compose exec backend php artisan migrate
 docker compose exec backend php artisan migrate:fresh --seed
 
 # Acceder al contenedor backend
-docker compose exec -it backend sh
+docker compose exec backend sh
 
 # Ver rutas API
 docker compose exec backend php artisan route:list
@@ -632,6 +717,9 @@ docker compose exec backend php artisan test
 
 # Frontend tests
 cd frontend && npm run test
+
+# Build frontend
+cd frontend && npm run build
 ```
 
 ## Variables de Entorno
@@ -653,6 +741,11 @@ DB_PASSWORD=parking_password
 # JWT
 JWT_SECRET=<generated>
 JWT_TTL=60
+JWT_REFRESH_TTL=20160
+
+# Frontend
+FRONTEND_PORT=5173
+VITE_API_URL=http://localhost:8000/api
 ```
 
 ## Licencia
