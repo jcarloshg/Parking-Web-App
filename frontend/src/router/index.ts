@@ -42,6 +42,11 @@ const routes = [
     component: () => import('@/views/Admin.vue'),
     meta: { requiresAuth: true, roles: ['admin'] },
   },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'not-found',
+    redirect: '/dashboard',
+  },
 ]
 
 const router = createRouter({
