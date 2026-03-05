@@ -26,6 +26,25 @@ export interface ReportSummary {
   }>
 }
 
+export interface DailyReport {
+  total_ingresos: number
+  tickets_atendidos: number
+  promedio_por_ticket: number
+  cajones_disponibles: number
+  tickets_activos: number
+  fecha: string
+}
+
+export interface MonthlyReport {
+  ingresos_por_día: Record<string, number>
+  hora_pica: number | null
+  tipo_vehiculo_frecuente: Record<string, number>
+  total_ingresos_mes: number
+  total_tickets_mes: number
+  año: number
+  mes: number
+}
+
 export interface PaginatedResponse<T> {
   current_page: number
   data: T[]
@@ -51,6 +70,6 @@ export const parkingApi = {
 
 export const reportsApi = {
   getSummary: () => api.get<ReportSummary>('/reports/summary'),
-  getDaily: (date?: string) => api.get('/reports/daily', { params: { date } }),
-  getMonthly: (year?: number, month?: number) => api.get('/reports/monthly', { params: { year, month } }),
+  getDaily: (date?: string) => api.get<{ data: DailyReport }>('/reports/daily', { params: { date } }),
+  getMonthly: (year?: number, month?: number) => api.get<{ data: MonthlyReport }>('/reports/monthly', { params: { year, month } }),
 }

@@ -625,7 +625,16 @@ DELETE /api/users/{id}      # Eliminar usuario
 
 ---
 
-### Phase 11: Frontend - Reportes (pendiente)
+### Phase 11: Frontend - Reportes (completado)
+
+- [x] Reports Layout con tabs: Diario, Mensual
+- [x] Filtros por fecha
+- [x] Tarjetas stats: Total ingresos, Tickets atendidos, Promedio por ticket
+- [x] Gráfica de ingresos por día (bar chart)
+- [x] Distribución tipo vehículo (pie chart)
+- [x] Chart.js instalado y configurado
+- [x] API Integration: GET /api/reports/daily, GET /api/reports/monthly
+- [x] Permisos: Admin/Supervisor pueden acceder, Cajero NO puede acceder
 
 - [ ] Reporte diario con filtros de fecha
 - [ ] Reporte mensual con gráficos
