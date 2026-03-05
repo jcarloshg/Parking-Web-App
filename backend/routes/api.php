@@ -15,11 +15,14 @@ Route::prefix('auth')->group(function () {
     Route::get('/me', [AuthController::class, 'me'])->middleware('auth:api');
 });
 
+Route::get('parking-spaces', [ParkingSpaceController::class, 'index']);
+Route::get('parking-spaces/{parkingSpace}', [ParkingSpaceController::class, 'show']);
+Route::get('parking-spaces/available', [ParkingSpaceController::class, 'available']);
+Route::get('parking-spaces/available-count', [ParkingSpaceController::class, 'availableCount']);
+
 Route::middleware('auth:api')->group(function () {
+    Route::apiResource('parking-spaces', ParkingSpaceController::class)->except(['index', 'show']);
     Route::apiResource('users', UserController::class);
-    Route::apiResource('parking-spaces', ParkingSpaceController::class);
-    Route::get('parking-spaces/available-count', [ParkingSpaceController::class, 'availableCount']);
-    Route::apiResource('tickets', TicketController::class);
     Route::get('tickets/active', [TicketController::class, 'active']);
     Route::get('tickets/search', [TicketController::class, 'search']);
     Route::get('tickets/{ticket}/calculate', [TicketController::class, 'calculate']);
