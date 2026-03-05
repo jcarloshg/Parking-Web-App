@@ -7,20 +7,26 @@ use Illuminate\Http\Request;
 
 class ParkingSpaceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(ParkingSpace::all());
+        $perPage = $request->get('per_page', 15);
+        $spaces = ParkingSpace::paginate($perPage);
+        
+        return response()->json($spaces);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'space_number' => 'required|string|unique:parking_spaces,space_number',
-            'type' => 'required|in:standard,compact,electric,disabled',
-            'hourly_rate' => 'required|numeric|min:0',
+            'number' => 'required|string|unique:parking_spaces,number|regex:/^[A-Z0-9-]+$/i',
+            'type' => 'required|in:general,discapacitado,eléctrico',
+            'status' => 'sometimes|in:disponible,ocupado,fuera_servicio',
         ]);
 
-        $validated['status'] = 'available';
+        if (!isset($validated['status'])) {
+            $validated['status'] = 'disponible';
+        }
+
         $parkingSpace = ParkingSpace::create($validated);
 
         return response()->json($parkingSpace, 201);
@@ -34,10 +40,9 @@ class ParkingSpaceController extends Controller
     public function update(Request $request, ParkingSpace $parkingSpace)
     {
         $validated = $request->validate([
-            'space_number' => 'sometimes|string|unique:parking_spaces,space_number,' . $parkingSpace->id,
-            'type' => 'sometimes|in:standard,compact,electric,disabled',
-            'status' => 'sometimes|in:available,occupied,maintenance',
-            'hourly_rate' => 'sometimes|numeric|min:0',
+            'number' => 'sometimes|string|unique:parking_spaces,number,' . $parkingSpace->id . '|regex:/^[A-Z0-9-]+$/i',
+            'type' => 'sometimes|in:general,discapacitado,eléctrico',
+            'status' => 'sometimes|in:disponible,ocupado,fuera_servicio',
         ]);
 
         $parkingSpace->update($validated);
@@ -51,9 +56,17 @@ class ParkingSpaceController extends Controller
         return response()->json(null, 204);
     }
 
+    public function available(Request $request)
+    {
+        $perPage = $request->get('per_page', 15);
+        $spaces = ParkingSpace::available()->paginate($perPage);
+        
+        return response()->json($spaces);
+    }
+
     public function availableCount()
     {
-        $count = ParkingSpace::where('status', 'available')->count();
+        $count = ParkingSpace::where('status', 'disponible')->count();
         return response()->json(['available_count' => $count]);
     }
 }
