@@ -88,7 +88,7 @@
               </div>
               <div class="detail-row">
                 <span>Tarifa:</span>
-                <span>${{ calculation.rate.toFixed(2) }}</span>
+                <span>${{ (calculation.rate_per_hour || calculation.rate)?.toFixed(2) }}</span>
               </div>
               <div class="detail-row total">
                 <span>Total:</span>
@@ -211,11 +211,11 @@ const handleSearch = async () => {
 
   try {
     const response = await ticketsApi.search(searchPlate.value.toUpperCase())
-    if (response.data.length === 0) {
+    if (response.data.data.length === 0) {
       notFound.value = true
       ticket.value = null
     } else {
-      const foundTicket = response.data[0]
+      const foundTicket = response.data.data[0]
       if (foundTicket) {
         ticket.value = foundTicket
         await loadCalculation()
@@ -236,7 +236,9 @@ const loadCalculation = async () => {
   calculating.value = true
   try {
     const response = await ticketsApi.calculate(ticket.value.id)
-    calculation.value = response.data
+    console.log('Calculation response:', response.data)
+    calculation.value = response.data.data
+    console.log('Calculation set:', calculation.value)
   } catch (err) {
     console.error('Error calculating fee:', err)
   } finally {
@@ -255,7 +257,7 @@ const handlePayment = async () => {
       ticket_id: ticket.value.id,
       payment_method: paymentMethod.value,
     })
-    paymentData.value = response.data
+    paymentData.value = response.data.data
     paymentSuccess.value = true
   } catch (err: unknown) {
     console.error('Error processing payment:', err)
