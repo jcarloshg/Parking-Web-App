@@ -32,6 +32,8 @@ Route::get('payments/today', [PaymentController::class, 'today']);
 Route::get('payments/calculate/{ticket}', [PaymentController::class, 'calculate']);
 Route::get('payments/{payment}', [PaymentController::class, 'show']);
 
+Route::get('reports/summary', [ReportController::class, 'summary']);
+
 Route::middleware('auth:api')->group(function () {
     Route::apiResource('parking-spaces', ParkingSpaceController::class)->except(['index', 'show']);
     Route::apiResource('users', UserController::class);

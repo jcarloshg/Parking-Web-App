@@ -344,8 +344,58 @@ DELETE /api/users/{id}
 
 ### Phase 7: Reportes
 
-- [ ] Reporte diario
-- [ ] Reporte mensual
+**Objetivo**: Implementar reportes diarios, mensuales y dashboard summary.
+
+**Tareas completadas**:
+
+1. **ReportController**:
+   - `daily()` - Reporte del día actual
+   - `monthly()` - Reporte del mes actual
+   - `summary()` - Resumen para dashboard
+
+2. **ReportService**:
+   - Lógica de reportes
+   - Métodos: getDailyReport(), getMonthlyReport(), getDashboardSummary(), canAccessReports()
+
+3. **Rutas API**:
+   ```
+   GET /api/reports/daily          # Reporte diario (Admin/Supervisor)
+   GET /api/reports/monthly        # Reporte mensual (Admin/Supervisor)
+   GET /api/reports/summary        # Dashboard summary (público)
+   ```
+
+4. **Reporte Diario**:
+   - total_ingresos
+   - tickets_atendidos
+   - promedio_por_ticket
+   - cajones_disponibles
+   - tickets_activos
+
+5. **Reporte Mensual**:
+   - ingresos_por_día
+   - hora_pica
+   - tipo_vehiculo_frecuente
+   - total_ingresos_mes
+   - total_tickets_mes
+
+6. **Dashboard Summary**:
+   - cajones_disponibles
+   - ingresos_dia
+   - tickets_activos
+   - ultimos_tickets (últimos 5)
+
+7. **Policies**:
+   - Admin y Supervisor pueden ver reportes
+   - Cajero no tiene acceso
+
+8. **Tests**:
+   - ReportApiTest (11 casos - todos passing)
+
+**Entregables**:
+- Reporte diario completo
+- Reporte mensual con agregaciones
+- Dashboard summary público
+- Permisos por rol (Admin/Supervisor)
 
 ### Phase 8-12: Frontend
 
