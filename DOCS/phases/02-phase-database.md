@@ -59,6 +59,52 @@ Crear el esquema de base de datos y modelos Eloquent.
 - [ ] ParkingSpaceSeeder (cajones de ejemplo)
 - [ ] DatabaseSeeder
 
+## Testing
+
+### Pruebas de Modelo
+```bash
+./vendor/bin/phpunit --filter=UserTest
+./vendor/bin/phpunit --filter=ParkingSpaceTest
+./vendor/bin/phpunit --filter=TicketTest
+./vendor/bin/phpunit --filter=PaymentTest
+```
+
+### Cobertura Objetivo
+- Modelos: 80%
+
+### Tests Requeridos
+- Relaciones entre modelos
+- Validación de atributos
+- Factory states y callbacks
+
+### Estructura de Tests
+```
+tests/Unit/Models/
+├── UserTest.php
+├── ParkingSpaceTest.php
+├── TicketTest.php
+└── PaymentTest.php
+```
+
+### Ejemplo: ParkingSpaceTest
+```php
+public function test_parking_space_has_many_tickets()
+{
+    $space = ParkingSpace::factory()->create();
+    $ticket = Ticket::factory()->for($space)->create();
+    
+    $this->assertTrue($space->tickets->contains($ticket));
+}
+
+public function test_available_spaces_scope()
+{
+    ParkingSpace::factory()->count(3)->create(['status' => 'disponible']);
+    ParkingSpace::factory()->count(2)->create(['status' => 'ocupado']);
+    
+    $this->assertCount(3, ParkingSpace::available()->get());
+}
+```
+
 ## Entregables
 - Migraciones ejecutadas
 - Modelos con relaciones

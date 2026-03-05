@@ -39,6 +39,78 @@ GET  /api/auth/me
 - Login: email (required|email), password (required)
 - Register: name, email (required|email|unique), password (required|min:6), role (required|in:admin,cajero,supervisor)
 
+## Testing
+
+### Pruebas de Autenticación
+```bash
+./vendor/bin/phpunit --filter=AuthApiTest
+./vendor/bin/phpunit --filter=AuthServiceTest
+```
+
+### Cobertura Objetivo
+- AuthController: 85%
+- AuthService: 90%
+
+### Tests Requeridos
+- Login exitoso retorna token JWT
+- Login con credenciales inválidas retorna error
+- Registro de usuario nuevo
+- Logout invalida token
+- Refresh token genera nuevo token
+- Proteción de rutas con middleware JWT
+
+### Estructura de Tests
+```
+tests/Feature/API/
+├── AuthApiTest.php
+tests/Unit/Services/
+└── AuthServiceTest.php
+```
+
+### Ejemplo: AuthApiTest
+```php
+public function test_user_can_login_with_valid_credentials()
+{
+    $user = User::factory()->create(['password' => 'password123']);
+
+    $response = $this->postJson('/api/auth/login', [
+        'email' => $user->email,
+        'password' => 'password123',
+    ]);
+
+    $response->assertStatus(200)
+        ->assertJsonStructure(['access_token', 'token_type']);
+}
+
+public function test_login_fails_with_invalid_password()
+{
+    $user = User::factory()->create();
+
+    $response = $this->postJson('/api/auth/login', [
+        'email' => $user->email,
+        'password' => 'wrongpassword',
+    ]);
+
+    $response->assertStatus(401);
+}
+
+public function test_authenticated_user_can_logout()
+{
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user, 'api')
+        ->postJson('/api/auth/logout');
+
+    $response->assertStatus(200);
+}
+
+public function test_unauthenticated_user_cannot_access_protected_routes()
+{
+    $response = $this->getJson('/api/auth/me');
+    $response->assertStatus(401);
+}
+```
+
 ## Entregables
 - Endpoints de autenticación funcionando
 - JWT token generado y validado

@@ -12,7 +12,7 @@ Configurar el entorno de desarrollo y estructura base del proyecto.
 parking-web-app/
 ├── backend/          # Laravel API
 ├── frontend/         # Vue.js SPA
-└── docs/             # Documentación
+├── docs/             # Documentación
 ```
 
 ### 1.2 Backend - Laravel
@@ -34,6 +34,41 @@ parking-web-app/
 
 - [ ] Crear base de datos MySQL: `parking_db`
 - [ ] Configurar conexión en `.env`
+
+### 1.5 Testing Setup
+
+#### PHPUnit Configuration
+```bash
+# Verificar que phpunit está configurado
+./vendor/bin/phpunit --version
+
+# Estructura de tests inicial
+mkdir -p tests/Unit/Models tests/Unit/Services tests/Feature/API
+```
+
+#### Vitest Configuration
+```bash
+# Instalar dependencias de testing
+npm install -D vitest @vue/test-utils jsdom
+
+# Verificar configuración
+npm run test
+```
+
+## Testing
+
+### Pruebas Iniciales
+```bash
+# Backend
+./vendor/bin/phpunit
+
+# Frontend
+npm run test
+```
+
+### Cobertura Objetivo
+- Setup inicial: Verificar que los tests base funcionan
+- Configurar CI/CD para ejecución automática
 
 ## Entregables
 

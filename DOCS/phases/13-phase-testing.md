@@ -3,6 +3,98 @@
 ## Objetivo
 Completar testing y preparar entregables finales.
 
+## Testing Best Practices
+
+### Comandos de Testing
+
+#### Backend
+```bash
+# Ejecutar todos los tests
+./vendor/bin/phpunit
+
+# Tests con cobertura
+./vendor/bin/phpunit --coverage-html coverage
+
+# Tests específicos
+./vendor/bin/phpunit --filter=TicketApiTest
+./vendor/bin/phpunit --filter=PaymentServiceTest
+
+# Modo verbose
+./vendor/bin/phpunit --testdox
+```
+
+#### Frontend
+```bash
+# Todos los tests
+npm run test
+
+# Coverage
+npm run test:coverage
+
+# Watch mode
+npm run test:watch
+
+# UI mode
+npm run test:ui
+```
+
+### Cobertura Objetivo
+
+| Componente | Target |
+|------------|--------|
+| Models | 80% |
+| Services | 80% |
+| Controllers/API | 85% |
+| FeeCalculator | 95% |
+| Frontend Components | 70% |
+
+### Estructura de Tests Completa
+
+```
+backend/tests/
+├── Unit/
+│   ├── Models/
+│   │   ├── UserTest.php
+│   │   ├── ParkingSpaceTest.php
+│   │   ├── TicketTest.php
+│   │   └── PaymentTest.php
+│   └── Services/
+│       ├── AuthServiceTest.php
+│       ├── ParkingSpaceServiceTest.php
+│       ├── TicketServiceTest.php
+│       ├── PaymentServiceTest.php
+│       ├── FeeCalculatorTest.php
+│       └── ReportServiceTest.php
+└── Feature/
+    └── API/
+        ├── AuthApiTest.php
+        ├── ParkingSpaceApiTest.php
+        ├── TicketApiTest.php
+        ├── PaymentApiTest.php
+        └── ReportApiTest.php
+
+frontend/tests/
+├── setup.ts
+├── stores/
+│   ├── auth.spec.ts
+│   └── parking.spec.ts
+├── composables/
+│   ├── useAuth.spec.ts
+│   ├── useParking.spec.ts
+│   └── usePayment.spec.ts
+├── pages/
+│   ├── LoginPage.spec.ts
+│   ├── Dashboard.spec.ts
+│   ├── EntryPage.spec.ts
+│   ├── ExitPage.spec.ts
+│   ├── ReportsPage.spec.ts
+│   └── AdminUsers.spec.ts
+└── components/
+    ├── ParkingGrid.spec.ts
+    ├── StatsCards.spec.ts
+    └── PaymentForm.spec.ts
+```
+
 ## Tareas
 
 ### 13.1 Backend Testing (PHPUnit)
@@ -63,5 +155,5 @@ Completar testing y preparar entregables finales.
 - [ ] Admin gestiona usuarios
 - [ ] Admin gestiona cajones
 - [ ] Paginación funciona
-- [ ] Validaciones работают
+- [ ] Validaciones trabajan
 - [ ] Tests pasan
