@@ -1,90 +1,497 @@
 <template>
-  <div class="dashboard">
-    <header>
-      <h1>Dashboard</h1>
-      <button @click="handleLogout">Cerrar Sesión</button>
-    </header>
-    <div class="stats">
-      <div class="stat-card">
-        <h3>Cajones Disponibles</h3>
-        <p>{{ summary?.cajones_disponibles ?? 0 }}</p>
+  <div class="dashboard-layout">
+    <aside class="sidebar">
+      <div class="logo">
+        <h2>Parking</h2>
       </div>
-      <div class="stat-card">
-        <h3>Ingresos del Día</h3>
-        <p>${{ summary?.ingresos_dia ?? 0 }}</p>
-      </div>
-      <div class="stat-card">
-        <h3>Tickets Activos</h3>
-        <p>{{ summary?.tickets_activos ?? 0 }}</p>
-      </div>
+      <nav class="nav-menu">
+        <router-link to="/dashboard" class="nav-item" :class="{ active: $route.path === '/dashboard' }">
+          <span class="icon">📊</span>
+          Dashboard
+        </router-link>
+        <router-link to="/entry" class="nav-item" :class="{ active: $route.path === '/entry' }">
+          <span class="icon">🚗</span>
+          Entrada
+        </router-link>
+        <router-link to="/exit" class="nav-item" :class="{ active: $route.path === '/exit' }">
+          <span class="icon">🚙</span>
+          Salida
+        </router-link>
+        <router-link v-if="canViewReports" to="/reports" class="nav-item" :class="{ active: $route.path === '/reports' }">
+          <span class="icon">📈</span>
+          Reportes
+        </router-link>
+        <router-link v-if="isAdmin" to="/admin" class="nav-item" :class="{ active: $route.path === '/admin' }">
+          <span class="icon">⚙️</span>
+          Admin
+        </router-link>
+      </nav>
+    </aside>
+
+    <div class="main-content">
+      <header class="header">
+        <h1>Dashboard</h1>
+        <div class="user-info">
+          <span class="user-name">{{ userName }}</span>
+          <span class="user-role">{{ userRole }}</span>
+          <button @click="handleLogout" class="logout-btn">Cerrar Sesión</button>
+        </div>
+      </header>
+
+      <main class="content">
+        <div class="stats-grid">
+          <div class="stat-card income">
+            <div class="stat-icon">💰</div>
+            <div class="stat-info">
+              <h3>Ingresos del Día</h3>
+              <p class="stat-value">${{ formatNumber(summary?.ingresos_dia ?? 0) }}</p>
+            </div>
+          </div>
+          <div class="stat-card tickets">
+            <div class="stat-icon">🎫</div>
+            <div class="stat-info">
+              <h3>Tickets Activos</h3>
+              <p class="stat-value">{{ summary?.tickets_activos ?? 0 }}</p>
+            </div>
+          </div>
+          <div class="stat-card spaces">
+            <div class="stat-icon">🅿️</div>
+            <div class="stat-info">
+              <h3>Cajones Disponibles</h3>
+              <p class="stat-value">{{ summary?.cajones_disponibles ?? 0 }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="parking-section">
+          <h2>Estado de Cajones</h2>
+          <div class="parking-grid">
+            <div
+              v-for="space in parkingSpaces"
+              :key="space.id"
+              class="parking-space"
+              :class="getStatusClass(space.status)"
+            >
+              <span class="space-number">{{ space.number }}</span>
+              <span class="space-type">{{ getTypeLabel(space.type) }}</span>
+              <span class="space-status">{{ getStatusLabel(space.status) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="summary?.ultimos_tickets?.length" class="last-ticket-section">
+          <h2>Últimos Tickets</h2>
+          <div class="tickets-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Placa</th>
+                  <th>Tipo</th>
+                  <th>Cajón</th>
+                  <th>Hora de Entrada</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="ticket in summary.ultimos_tickets" :key="ticket.id">
+                  <td>{{ ticket.plate }}</td>
+                  <td>{{ ticket.vehicle_type }}</td>
+                  <td>{{ ticket.parking_space?.number ?? '-' }}</td>
+                  <td>{{ formatDate(ticket.entry_time) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="refresh-info">
+          <span>Actualizando cada 30 segundos...</span>
+          <span class="last-update">Última actualización: {{ lastUpdate }}</span>
+        </div>
+      </main>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useAuth } from '@/composables/useAuth'
-import api from '@/api'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import { parkingApi, reportsApi, type ParkingSpace, type ReportSummary } from '@/api/parking'
 
-const { logout } = useAuth()
-const summary = ref<{
-  cajones_disponibles: number
-  ingresos_dia: number
-  tickets_activos: number
-} | null>(null)
+const router = useRouter()
+const authStore = useAuthStore()
 
-const handleLogout = async () => {
-  await logout()
+const parkingSpaces = ref<ParkingSpace[]>([])
+const summary = ref<ReportSummary | null>(null)
+const lastUpdate = ref('')
+const refreshInterval = ref<number | null>(null)
+
+const isAdmin = computed(() => authStore.user?.role === 'admin')
+const canViewReports = computed(() => authStore.user?.role === 'admin' || authStore.user?.role === 'supervisor')
+const userName = computed(() => authStore.user?.name ?? 'Usuario')
+const userRole = computed(() => {
+  const roles: Record<string, string> = {
+    admin: 'Administrador',
+    cajero: 'Cajero',
+    supervisor: 'Supervisor'
+  }
+  return roles[authStore.user?.role ?? ''] ?? authStore.user?.role ?? ''
+})
+
+const formatNumber = (num: number) => {
+  return num.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
-onMounted(async () => {
+const formatDate = (dateStr: string) => {
+  return new Date(dateStr).toLocaleString('es-MX')
+}
+
+const getStatusClass = (status: string) => {
+  const classes: Record<string, string> = {
+    disponible: 'status-available',
+    ocupado: 'status-occupied',
+    fuera_servicio: 'status-disabled'
+  }
+  return classes[status] ?? ''
+}
+
+const getStatusLabel = (status: string) => {
+  const labels: Record<string, string> = {
+    disponible: 'Disponible',
+    ocupado: 'Ocupado',
+    fuera_servicio: 'Fuera de servicio'
+  }
+  return labels[status] ?? status
+}
+
+const getTypeLabel = (type: string) => {
+  const labels: Record<string, string> = {
+    general: 'General',
+    discapacitado: 'Discapacitado',
+    eléctrico: 'Eléctrico'
+  }
+  return labels[type] ?? type
+}
+
+const loadData = async () => {
   try {
-    const response = await api.get('/reports/summary')
-    summary.value = response.data
+    const [spacesRes, summaryRes] = await Promise.all([
+      parkingApi.getAll(),
+      reportsApi.getSummary()
+    ])
+    parkingSpaces.value = spacesRes.data
+    summary.value = summaryRes.data
+    lastUpdate.value = new Date().toLocaleTimeString('es-MX')
   } catch (err) {
-    console.error('Failed to load summary:', err)
+    console.error('Failed to load dashboard data:', err)
+  }
+}
+
+const handleLogout = async () => {
+  await authStore.logout()
+  router.push('/login')
+}
+
+onMounted(() => {
+  loadData()
+  refreshInterval.value = window.setInterval(loadData, 30000)
+})
+
+onUnmounted(() => {
+  if (refreshInterval.value) {
+    clearInterval(refreshInterval.value)
   }
 })
 </script>
 
 <style scoped>
-.dashboard {
-  padding: 2rem;
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f5f7fa;
 }
-header {
+
+.sidebar {
+  width: 250px;
+  background-color: #1e3a5f;
+  color: white;
+  padding: 1rem 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.logo {
+  padding: 1.5rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.nav-menu {
+  flex: 1;
+  padding: 1rem 0;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.5rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.nav-item.active {
+  background-color: #2d5a8a;
+  color: white;
+  border-left: 3px solid #4ade80;
+}
+
+.icon {
+  font-size: 1.25rem;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background-color: white;
+  padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
-button {
-  padding: 0.5rem 1rem;
+
+.header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #1e3a5f;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.user-role {
+  font-size: 0.875rem;
+  color: #666;
+  background-color: #e5e7eb;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+}
+
+.logout-btn {
   background-color: #dc3545;
   color: white;
   border: none;
+  padding: 0.5rem 1rem;
   border-radius: 4px;
   cursor: pointer;
-}
-.stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-}
-.stat-card {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-.stat-card h3 {
-  margin: 0 0 0.5rem 0;
-  color: #666;
   font-size: 0.875rem;
 }
-.stat-card p {
+
+.logout-btn:hover {
+  background-color: #c82333;
+}
+
+.content {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.stat-icon {
+  font-size: 2.5rem;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f3f4f6;
+  border-radius: 12px;
+}
+
+.stat-card.income .stat-icon {
+  background-color: #dcfce7;
+}
+
+.stat-card.tickets .stat-icon {
+  background-color: #dbeafe;
+}
+
+.stat-card.spaces .stat-icon {
+  background-color: #fef3c7;
+}
+
+.stat-info h3 {
+  margin: 0 0 0.25rem 0;
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.stat-value {
   margin: 0;
-  font-size: 2rem;
-  font-weight: bold;
-  color: #333;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.parking-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 2rem;
+}
+
+.parking-section h2 {
+  margin: 0 0 1rem 0;
+  font-size: 1.25rem;
+  color: #1e3a5f;
+}
+
+.parking-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1rem;
+}
+
+.parking-space {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  transition: transform 0.2s;
+}
+
+.parking-space:hover {
+  transform: scale(1.05);
+}
+
+.status-available {
+  background-color: #dcfce7;
+  border: 2px solid #22c55e;
+}
+
+.status-occupied {
+  background-color: #fee2e2;
+  border: 2px solid #ef4444;
+}
+
+.status-disabled {
+  background-color: #e5e7eb;
+  border: 2px solid #9ca3af;
+}
+
+.space-number {
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: #1f2937;
+}
+
+.space-type {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.space-status {
+  font-size: 0.625rem;
+  color: #6b7280;
+}
+
+.last-ticket-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 2rem;
+}
+
+.last-ticket-section h2 {
+  margin: 0 0 1rem 0;
+  font-size: 1.25rem;
+  color: #1e3a5f;
+}
+
+.tickets-table {
+  overflow-x: auto;
+}
+
+.tickets-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tickets-table th,
+.tickets-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tickets-table th {
+  background-color: #f9fafb;
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+.tickets-table td {
+  color: #1f2937;
+  font-size: 0.875rem;
+}
+
+.tickets-table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+.refresh-info {
+  display: flex;
+  justify-content: space-between;
+  color: #9ca3af;
+  font-size: 0.875rem;
 }
 </style>
