@@ -33,8 +33,12 @@ export interface TicketSearch {
 export interface TicketCalculation {
   hours: number
   rate: number
+  rate_per_hour?: number
   subtotal: number
   total: number
+  entry_time?: string
+  exit_time?: string
+  minutes?: number
   breakdown: {
     hours: number
     rate: number
@@ -42,10 +46,21 @@ export interface TicketCalculation {
   }
 }
 
+export interface TicketCalculationResponse {
+  data: TicketCalculation
+}
+
+export interface PaginatedTickets {
+  data: Ticket[]
+  current_page: number
+  last_page: number
+  total: number
+}
+
 export const ticketsApi = {
   create: (data: TicketCreate) => api.post<TicketResponse>('/tickets', data),
-  search: (plate: string) => api.get<Ticket[]>('/tickets/search', { params: { plate } }),
-  getActive: () => api.get<Ticket[]>('/tickets/active'),
+  search: (plate: string) => api.get<PaginatedTickets>('/tickets/search', { params: { plate } }),
+  getActive: () => api.get<PaginatedTickets>('/tickets/active'),
   getById: (id: number) => api.get<Ticket>(`/tickets/${id}`),
-  calculate: (id: number) => api.get<TicketCalculation>(`/tickets/${id}/calculate`),
+  calculate: (id: number) => api.get<TicketCalculationResponse>(`/tickets/${id}/calculate`),
 }

@@ -34,9 +34,13 @@ export interface PaymentCalculation {
   }
 }
 
+export interface PaymentResponse {
+  data: Payment
+}
+
 export const paymentsApi = {
-  calculate: (ticketId: number) => api.get<PaymentCalculation>(`/payments/calculate/${ticketId}`),
-  process: (data: PaymentCreate) => api.post<Payment>('/payments', data),
+  calculate: (ticketId: number) => api.get<{ data: PaymentCalculation }>(`/payments/calculate/${ticketId}`),
+  process: (data: PaymentCreate) => api.post<PaymentResponse>('/payments', data),
   getToday: () => api.get<Payment[]>('/payments/today'),
   getById: (id: number) => api.get<Payment>(`/payments/${id}`),
 }
