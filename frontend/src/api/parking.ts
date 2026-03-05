@@ -24,8 +24,24 @@ export interface ReportSummary {
   }>
 }
 
+export interface PaginatedResponse<T> {
+  current_page: number
+  data: T[]
+  first_page_url: string
+  from: number
+  last_page: number
+  last_page_url: string
+  links: Array<{ url: string | null; label: string; page: number | null; active: boolean }>
+  next_page_url: string | null
+  path: string
+  per_page: number
+  prev_page_url: string | null
+  to: number
+  total: number
+}
+
 export const parkingApi = {
-  getAll: () => api.get<ParkingSpace[]>('/parking-spaces'),
+  getAll: () => api.get<PaginatedResponse<ParkingSpace>>('/parking-spaces'),
   getById: (id: number) => api.get<ParkingSpace>(`/parking-spaces/${id}`),
   getAvailable: () => api.get<ParkingSpace[]>('/parking-spaces/available'),
   getAvailableCount: () => api.get<{ count: number }>('/parking-spaces/available-count'),
