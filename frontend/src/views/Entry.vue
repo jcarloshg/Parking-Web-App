@@ -148,7 +148,7 @@ const handleSubmit = async () => {
       vehicle_type: form.vehicleType as 'auto' | 'moto' | 'camioneta',
       parking_space_id: form.parkingSpaceId!,
     })
-    successTicket.value = response.data
+    successTicket.value = response.data.data
   } catch (err: unknown) {
     console.error('Error creating ticket:', err)
     const error = err as { response?: { data?: { message?: string } } }

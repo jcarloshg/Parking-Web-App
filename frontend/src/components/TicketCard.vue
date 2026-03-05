@@ -67,8 +67,11 @@ const vehicleTypeLabel = computed(() => {
   return vehicleTypeLabels[props.ticket.vehicle_type] || props.ticket.vehicle_type
 })
 
-const formatDateTime = (dateStr: string) => {
-  const date = new Date(dateStr)
+const formatDateTime = (dateStr: string | undefined) => {
+  if (!dateStr) return '-'
+  const normalized = dateStr.replace(/\.(\d{6})\d*Z$/, '.$1Z')
+  const date = new Date(normalized)
+  if (isNaN(date.getTime())) return 'Invalid Date'
   return date.toLocaleString('es-MX', {
     day: '2-digit',
     month: '2-digit',
@@ -79,7 +82,9 @@ const formatDateTime = (dateStr: string) => {
 }
 
 const elapsedTime = computed(() => {
-  const entry = new Date(props.ticket.entry_time)
+  const normalized = props.ticket.entry_time.replace(/\.(\d{6})\d*Z$/, '.$1Z')
+  const entry = new Date(normalized)
+  if (isNaN(entry.getTime())) return null
   const now = new Date()
   const diffMs = now.getTime() - entry.getTime()
   

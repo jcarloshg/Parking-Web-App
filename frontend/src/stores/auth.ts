@@ -29,10 +29,10 @@ export const useAuthStore = defineStore('auth', () => {
 
     try {
       const response = await authApi.login(credentials)
-      token.value = response.token
+      token.value = response.access_token
       user.value = response.user
 
-      localStorage.setItem('token', response.token)
+      localStorage.setItem('token', response.access_token)
       localStorage.setItem('user', JSON.stringify(response.user))
 
       return response

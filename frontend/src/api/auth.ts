@@ -9,7 +9,9 @@ export interface User {
 
 export interface LoginResponse {
   user: User
-  token: string
+  access_token: string
+  token_type: string
+  expires_in: number
 }
 
 export interface LoginRequest {
@@ -38,7 +40,7 @@ export const authApi = {
   },
 
   me: async (): Promise<User> => {
-    const response = await api.get<{ data: User }>('/auth/me')
-    return response.data.data
+    const response = await api.get<User>('/auth/me')
+    return response.data
   },
 }
