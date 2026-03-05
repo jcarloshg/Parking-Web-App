@@ -89,6 +89,7 @@
                   <th>Tipo</th>
                   <th>Cajón</th>
                   <th>Hora de Entrada</th>
+                  <th>Hora de Salida</th>
                 </tr>
               </thead>
               <tbody>
@@ -97,6 +98,7 @@
                   <td>{{ ticket.vehicle_type }}</td>
                   <td>{{ ticket.parking_space?.number ?? '-' }}</td>
                   <td>{{ formatDate(ticket.entry_time) }}</td>
+                  <td>{{ ticket.exit_time ? formatDate(ticket.exit_time) : '-' }}</td>
                 </tr>
               </tbody>
             </table>
@@ -138,7 +140,14 @@ const validParkingSpaces = computed(() => {
 
 const validTickets = computed(() => {
   if (!summary.value?.ultimos_tickets) return []
-  return summary.value.ultimos_tickets.filter(t => t != null && typeof t.id === 'number')
+  const tickets = summary.value.ultimos_tickets.filter(t => t != null && typeof t.id === 'number')
+  return tickets.sort((a, b) => {
+    const aActive = a.status === 'activo' || !a.exit_time
+    const bActive = b.status === 'activo' || !b.exit_time
+    if (aActive && !bActive) return -1
+    if (!aActive && bActive) return 1
+    return 0
+  })
 })
 
 const isAdmin = computed(() => authStore.user?.role === 'admin')

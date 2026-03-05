@@ -18,6 +18,8 @@ export interface ReportSummary {
     plate_number: string
     vehicle_type: string
     entry_time: string
+    exit_time?: string
+    status?: string
     parking_space?: {
       number: string
     }
