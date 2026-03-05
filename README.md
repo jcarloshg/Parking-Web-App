@@ -397,11 +397,67 @@ DELETE /api/users/{id}
 - Dashboard summary público
 - Permisos por rol (Admin/Supervisor)
 
-### Phase 8-12: Frontend
+### Phase 8: Frontend - Autenticación
 
-- [ ] Phase 8: Autenticación
-- [ ] Phase 9: Dashboard
-- [ ] Phase 10: Entrada/Salida
+**Objetivo**: Implementar autenticación en Vue.js con JWT.
+
+**Tareas completadas**:
+
+1. **Estructura**:
+   - Router con vue-router
+   - Pinia store para auth
+   - Composables/useAuth
+
+2. **Router**:
+   - Rutas públicas: /login
+   - Rutas privadas: /dashboard, /entry, /exit, /reports, /admin
+   - Guard: verificar token antes de navegar
+   - Redirect a /login si no autenticado
+
+3. **Auth Store (Pinia)**:
+   - state: user, token, isAuthenticated
+   - actions: login(), logout(), fetchUser()
+   - getters: isAdmin, isCajero, isSupervisor
+
+4. **API Configuration**:
+   - Axios con interceptor para Authorization header
+   - Manejo de 401 → logout + redirect login
+   - baseURL configurado
+
+5. **Login Page**:
+   - Formulario: email, password
+   - Validación frontend
+   - Llamar API /api/auth/login
+   - Guardar token en localStorage
+   - Redireccionar según rol
+
+6. **Logout**:
+   - Llamar API /api/auth/logout
+   - Limpiar token y user del store
+   - Redirect a /login
+
+**Archivos creados**:
+- frontend/src/api/index.ts
+- frontend/src/api/auth.ts
+- frontend/src/stores/auth.ts
+- frontend/src/composables/useAuth.ts
+- frontend/src/router/index.ts
+- frontend/src/views/Login.vue
+- frontend/src/views/Dashboard.vue
+- frontend/src/views/Entry.vue
+- frontend/src/views/Exit.vue
+- frontend/src/views/Reports.vue
+- frontend/src/views/Admin.vue
+- frontend/.env
+
+**Entregables**:
+- Login funcional
+- JWT almacenado y enviado en requests
+- Protección de rutas
+- Logout funcionando
+- Redirección según rol
+
+### Phase 9: Dashboard
 - [ ] Phase 11: Reportes
 - [ ] Phase 12: Administración
 
