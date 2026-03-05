@@ -16,6 +16,10 @@ export interface Ticket {
   updated_at: string
 }
 
+export interface TicketResponse {
+  data: Ticket
+}
+
 export interface TicketCreate {
   plate_number: string
   vehicle_type: 'auto' | 'moto' | 'camioneta'
@@ -39,7 +43,7 @@ export interface TicketCalculation {
 }
 
 export const ticketsApi = {
-  create: (data: TicketCreate) => api.post<Ticket>('/tickets', data),
+  create: (data: TicketCreate) => api.post<TicketResponse>('/tickets', data),
   search: (plate: string) => api.get<Ticket[]>('/tickets/search', { params: { plate } }),
   getActive: () => api.get<Ticket[]>('/tickets/active'),
   getById: (id: number) => api.get<Ticket>(`/tickets/${id}`),
