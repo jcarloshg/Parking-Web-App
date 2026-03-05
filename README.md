@@ -170,6 +170,7 @@ DELETE /api/users/{id}
    - `me()` - retorna usuario actual
 
 3. **Rutas API**:
+
    ```
    POST /api/auth/login
    POST /api/auth/register
@@ -189,6 +190,7 @@ DELETE /api/users/{id}
    - AuthServiceTest (7 test cases)
 
 **Entregables**:
+
 - Endpoints de autenticación funcionando
 - JWT token generado y validado
 - Logout y refresh token implementados
@@ -197,9 +199,48 @@ DELETE /api/users/{id}
 
 ### Phase 4: Gestión de Espacios
 
-- [ ] CRUD de espacios de estacionamiento
-- [ ] Estados de espacios (disponible/ocupado/fuera_servicio)
-- [ ] Tipos de espacios (general/discapacitado/eléctrico)
+**Objetivo**: Implementar API REST para espacios de estacionamiento con CRUD, paginación y políticas de acceso.
+
+**Tareas completadas**:
+
+1. **ParkingSpaceController**:
+   - `index()` - Listar espacios con paginación (filtros: type, status)
+   - `store()` - Crear espacio (Admin)
+   - `show()` - Ver espacio específico
+   - `update()` - Actualizar espacio (Admin)
+   - `destroy()` - Eliminar espacio (Admin)
+
+2. **ParkingSpaceService**:
+   - Lógica de negocio separada
+   - Métodos: getAll(), getById(), create(), update(), delete(), getAvailableCount()
+
+3. **ParkingSpacePolicy**:
+   - Admin: CRUD completo
+   - Cajero/Supervisor: solo lectura (index, show)
+
+4. **Rutas API**:
+
+   ```
+   GET    /api/parking-spaces              # Listar (público)
+   POST   /api/parking-spaces              # Crear (Admin)
+   GET    /api/parking-spaces/{id}         # Ver (público)
+   PUT    /api/parking-spaces/{id}         # Actualizar (Admin)
+   DELETE /api/parking-spaces/{id}         # Eliminar (Admin)
+   GET    /api/parking-spaces/available    # Espacios disponibles
+   GET    /api/parking-spaces/available-count  # Conteo disponibles
+   ```
+
+5. **Tests**:
+   - ParkingSpaceApiTest (12 casos)
+   - ParkingSpaceServiceTest (10 casos)
+
+**Entregables**:
+
+- Endpoints funcionando con paginación
+- Políticas de acceso por rol
+- Tests passing
+
+**Issue**: Ruta `/api/parking-spaces/available-count` retorna 404 por conflicto con apiResource
 
 ### Phase 5: Tickets
 
