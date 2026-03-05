@@ -31,14 +31,14 @@
     <div class="main-content">
       <header class="header">
         <h1>Dashboard</h1>
-        <div class="user-info">
+        <div class="user-info" v-if="authStore.user">
           <span class="user-name">{{ userName }}</span>
           <span class="user-role">{{ userRole }}</span>
           <button @click="handleLogout" class="logout-btn">Cerrar Sesión</button>
         </div>
       </header>
 
-      <main class="content">
+      <main class="content" v-if="!isLoading">
         <div class="stats-grid">
           <div class="stat-card income">
             <div class="stat-icon">💰</div>
@@ -67,7 +67,7 @@
           <h2>Estado de Cajones</h2>
           <div class="parking-grid">
             <div
-              v-for="space in parkingSpaces"
+              v-for="space in validParkingSpaces"
               :key="space.id"
               class="parking-space"
               :class="getStatusClass(space.status)"
@@ -79,7 +79,7 @@
           </div>
         </div>
 
-        <div v-if="summary?.ultimos_tickets?.length" class="last-ticket-section">
+        <div v-if="validTickets.length" class="last-ticket-section">
           <h2>Últimos Tickets</h2>
           <div class="tickets-table">
             <table>
@@ -92,7 +92,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="ticket in summary.ultimos_tickets" :key="ticket.id">
+                <tr v-for="ticket in validTickets" :key="ticket.id">
                   <td>{{ ticket.plate }}</td>
                   <td>{{ ticket.vehicle_type }}</td>
                   <td>{{ ticket.parking_space?.number ?? '-' }}</td>
@@ -107,6 +107,10 @@
           <span>Actualizando cada 30 segundos...</span>
           <span class="last-update">Última actualización: {{ lastUpdate }}</span>
         </div>
+      </main>
+
+      <main v-else class="content">
+        <div class="loading">Cargando datos del dashboard...</div>
       </main>
     </div>
   </div>
@@ -125,17 +129,29 @@ const parkingSpaces = ref<ParkingSpace[]>([])
 const summary = ref<ReportSummary | null>(null)
 const lastUpdate = ref('')
 const refreshInterval = ref<number | null>(null)
+const isLoading = ref(true)
+
+const validParkingSpaces = computed(() => {
+  if (!parkingSpaces.value) return []
+  return parkingSpaces.value.filter(space => space != null && typeof space.id === 'number')
+})
+
+const validTickets = computed(() => {
+  if (!summary.value?.ultimos_tickets) return []
+  return summary.value.ultimos_tickets.filter(t => t != null && typeof t.id === 'number')
+})
 
 const isAdmin = computed(() => authStore.user?.role === 'admin')
 const canViewReports = computed(() => authStore.user?.role === 'admin' || authStore.user?.role === 'supervisor')
 const userName = computed(() => authStore.user?.name ?? 'Usuario')
 const userRole = computed(() => {
+  if (!authStore.user) return ''
   const roles: Record<string, string> = {
     admin: 'Administrador',
     cajero: 'Cajero',
     supervisor: 'Supervisor'
   }
-  return roles[authStore.user?.role ?? ''] ?? authStore.user?.role ?? ''
+  return roles[authStore.user.role] ?? authStore.user.role
 })
 
 const formatNumber = (num: number) => {
@@ -175,15 +191,18 @@ const getTypeLabel = (type: string) => {
 
 const loadData = async () => {
   try {
+    isLoading.value = true
     const [spacesRes, summaryRes] = await Promise.all([
       parkingApi.getAll(),
       reportsApi.getSummary()
     ])
-    parkingSpaces.value = spacesRes.data
+    parkingSpaces.value = (spacesRes.data.data ?? []).filter(space => space && space.id)
     summary.value = summaryRes.data
     lastUpdate.value = new Date().toLocaleTimeString('es-MX')
   } catch (err) {
     console.error('Failed to load dashboard data:', err)
+  } finally {
+    isLoading.value = false
   }
 }
 
@@ -193,6 +212,8 @@ const handleLogout = async () => {
 }
 
 onMounted(() => {
+  // Ensure user is initialized before loading data
+  authStore.initialize()
   loadData()
   refreshInterval.value = window.setInterval(loadData, 30000)
 })
@@ -493,5 +514,14 @@ onUnmounted(() => {
   justify-content: space-between;
   color: #9ca3af;
   font-size: 0.875rem;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: #6b7280;
+  font-size: 1.125rem;
 }
 </style>
