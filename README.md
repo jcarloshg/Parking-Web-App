@@ -293,9 +293,54 @@ DELETE /api/users/{id}
 
 ### Phase 6: Pagos
 
-- [ ] Registro de pagos
-- [ ] Métodos de pago (efectivo/tarjeta)
-- [ ] Cierre de ticket
+**Objetivo**: Implementar cálculo de tarifas y registro de pagos.
+
+**Tareas completadas**:
+
+1. **FeeCalculator** (CRÍTICO):
+   - Tarifas por tipo de vehículo:
+     - auto: $20/hora, $150/día
+     - moto: $10/hora, $80/día
+     - camioneta: $30/hora, $200/día
+   - Tolerancia: 10 minutos = $0
+   - Cobro por hora completa
+   - Tarifa diaria después de 24h
+
+2. **PaymentController**:
+   - `index()` - Listar pagos (paginado)
+   - `store()` - Crear pago
+   - `show()` - Ver pago específico
+   - `today()` - Pagos de hoy
+   - `calculate()` - Calcular tarifa sin pagar
+
+3. **PaymentService**:
+   - Lógica de procesamiento de pagos
+   - Métodos: getAll(), getById(), getToday(), calculateFee(), processPayment()
+
+4. **Rutas API**:
+   ```
+   GET    /api/payments                 # Listar pagos (público)
+   POST   /api/payments                 # Registrar pago (Auth)
+   GET    /api/payments/{id}           # Ver pago (público)
+   GET    /api/payments/today         # Pagos de hoy
+   GET    /api/payments/calculate/{ticket_id}  # Calcular tarifa
+   ```
+
+5. **Validaciones**:
+   - ticket_id: required|exists:tickets,id
+   - payment_method: required|in:efectivo,tarjeta
+
+6. **Tests**:
+   - FeeCalculatorTest (17 casos - todos passing)
+   - PaymentApiTest (10 casos - 7 passing)
+
+**Entregables**:
+- Cálculo de tarifas funcionando
+- Tolerancia de 10 minutos
+- Tarifas diferenciadas por tipo de vehículo
+- Tarifa diaria después de 24h
+- Procesamiento de pago completo
+- Liberación de cajón al pagar
 
 ### Phase 7: Reportes
 
