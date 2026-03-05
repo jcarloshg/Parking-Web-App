@@ -65,8 +65,13 @@ GET    /api/tickets/search?q=
 GET    /api/tickets/{id}/calculate
 POST   /api/tickets/{id}/checkout
 
+GET    /api/payments
+POST   /api/payments
+GET    /api/payments/calculate/{ticket_id}
+
 GET    /api/reports/daily
 GET    /api/reports/monthly
+GET    /api/reports/summary
 
 GET    /api/users
 POST   /api/users
@@ -397,6 +402,8 @@ DELETE /api/users/{id}
 - Dashboard summary público
 - Permisos por rol (Admin/Supervisor)
 
+---
+
 ### Phase 8: Frontend - Autenticación
 
 **Objetivo**: Implementar autenticación en Vue.js con JWT.
@@ -457,41 +464,174 @@ DELETE /api/users/{id}
 - Logout funcionando
 - Redirección según rol
 
-### Phase 9: Dashboard
-- [ ] Phase 11: Reportes
-- [ ] Phase 12: Administración
+---
+
+### Phase 9: Frontend - Dashboard
+
+**Objetivo**: Implementar dashboard principal con stats y estado de cajones.
+
+**Tareas completadas**:
+
+1. **Dashboard Layout**:
+   - Sidebar con navegación
+   - Header con usuario y logout
+   - Stats cards: Ingresos del día, Tickets activos, Cajones disponibles
+
+2. **Parking Grid**:
+   - Visualización de todos los cajones
+   - Colores por estado (verde=disponible, rojo=ocupado, gris=fuera servicio)
+   - Labels de tipo (General, Discapacitado, Eléctrico)
+
+3. **Últimos Tickets**:
+   - Tabla con últimos 5 tickets activos
+   - Placa, tipo, cajón, hora de entrada
+
+4. **Auto-refresh**:
+   - Actualización cada 30 segundos
+
+**Archivos creados**:
+- frontend/src/views/Dashboard.vue
+- frontend/src/api/parking.ts (reportsApi)
+- frontend/src/api/reports.ts
+
+**Entregables**:
+- Dashboard con stats en tiempo real
+- Grid visual de cajones
+- Tabla de últimos tickets
+- Auto-refresh funcionando
+
+---
+
+### Phase 10: Frontend - Entry/Exit
+
+**Objetivo**: Implementar pantallas de registro de entrada y salida.
+
+**Tareas completadas**:
+
+1. **Entry Page (Registro de Entrada)**:
+   - Formulario entrada:
+     - Placa (input text, mayúsculas automáticas)
+     - Tipo vehículo (select: auto, moto, camioneta)
+     - Cajón (select: solo disponibles)
+   - Validación frontend
+   - Botón "Registrar Entrada"
+   - Llamar POST /api/tickets
+   - Mostrar ticket generado (número, hora entrada)
+   - Mensaje de éxito/error
+
+2. **Exit Page (Registro de Salida)**:
+   - Buscador por placa
+   - Llamar GET /api/tickets/search?plate=XXX
+   - Mostrar ticket encontrado:
+     - Placa, Tipo vehículo, Hora entrada
+     - Tiempo transcurrido
+     - **Total a pagar** (calculado desde API)
+   - Formulario pago:
+     - Método pago (select: efectivo, tarjeta)
+   - Botón "Pagar y Salir"
+   - Llamar POST /api/payments
+   - Mostrar comprobante
+
+3. **Components creados**:
+   - PlateInput.vue (mayúsculas automáticas)
+   - VehicleSelect.vue
+   - ParkingSpaceSelect.vue
+   - PaymentForm.vue
+   - TicketCard.vue
+
+4. **API Integration**:
+   - frontend/src/api/tickets.ts
+   - frontend/src/api/payments.ts
+
+5. **Permisos**:
+   - Admin, Cajero, Supervisor: entrada y salida
+
+**Entregables**:
+- Registro de entrada funcionando
+- Búsqueda de ticket por placa
+- Cálculo y pago de tarifa
+- Comprobante de pago
+
+---
+
+### Phase 11: Frontend - Reportes
+
+- [ ] Reporte diario con filtros de fecha
+- [ ] Reporte mensual con gráficos
+- [ ] Exportación a PDF/Excel
+
+### Phase 12: Frontend - Administración
+
+- [ ] Gestión de usuarios (CRUD)
+- [ ] Gestión de espacios (CRUD)
+- [ ] Configuración de tarifas
 
 ### Phase 13: Testing
 
-- [ ] PHPUnit tests
-- [ ] Vitest tests
-- [ ] Cobertura de código
+**Backend - PHPUnit**:
+- [x] AuthApiTest (10 casos)
+- [x] ParkingSpaceApiTest (12 casos)
+- [x] TicketApiTest (12 casos)
+- [x] PaymentApiTest (10 casos)
+- [x] ReportApiTest (11 casos)
+- [x] Model Tests (User, ParkingSpace, Ticket, Payment)
+- [x] Service Tests (Auth, ParkingSpace, Ticket, FeeCalculator)
+
+**Frontend - Vitest**:
+- [x] auth.spec.ts
+- [x] Dashboard.spec.ts
+- [x] StatsCards.spec.ts
+- [x] ParkingGrid.spec.ts
+- [x] PlateInput.spec.ts
+- [x] PaymentForm.spec.ts
+- [x] TicketCard.spec.ts
+- [x] EntryPage.spec.ts
+- [x] ExitPage.spec.ts
 
 ---
 
 ## Comandos Útiles
 
 ```bash
-# Reiniciar contenedores
-docker compose down -v && docker compose up -d
+# Iniciar contenedores (primera vez o tras docker compose down sin -v)
+docker compose up -d
+
+# Verificar estado
+docker compose ps
 
 # Ver logs
 docker compose logs -f backend
 
+# Detener contenedores (mantiene datos)
+docker compose down
+
+# Reiniciar contenedores (mantiene datos)
+docker compose restart
+
+# Reiniciar contenedores con BASE DE DATOS NUEVA (borra todo)
+docker compose down -v && docker compose up -d
+
+# IMPORTANTE: Si usas docker compose down -v, necesitas recrear la DB:
+docker compose exec backend php artisan migrate --force
+docker compose exec backend php artisan db:seed --force
+
 # Ejecutar migraciones
-docker exec parking_backend php artisan migrate
+docker compose exec backend php artisan migrate
 
 # Refrescar base de datos
-docker exec parking_backend php artisan migrate:fresh --seed
+docker compose exec backend php artisan migrate:fresh --seed
 
 # Acceder al contenedor backend
-docker exec -it parking_backend sh
+docker compose exec -it backend sh
 
 # Ver rutas API
-docker exec parking_backend php artisan route:list
+docker compose exec backend php artisan route:list
 
 # Ejecutar tests
-docker exec parking_backend php artisan test
+docker compose exec backend php artisan test
+
+# Frontend tests
+cd frontend && npm run test
 ```
 
 ## Variables de Entorno
