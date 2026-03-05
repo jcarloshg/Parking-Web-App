@@ -35,7 +35,7 @@ docker compose ps
 curl http://localhost:8000
 
 # Acceder al frontend
-curl http://localhost:80
+curl http://localhost:5173
 ```
 
 ## Credenciales de Prueba

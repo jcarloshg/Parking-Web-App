@@ -61,7 +61,7 @@ const loadSpaces = async () => {
   loading.value = true
   try {
     const response = await parkingApi.getAvailable()
-    options.value = response.data
+    options.value = response.data.data
   } catch (err) {
     console.error('Error loading parking spaces:', err)
   } finally {

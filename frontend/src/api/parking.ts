@@ -43,7 +43,7 @@ export interface PaginatedResponse<T> {
 export const parkingApi = {
   getAll: () => api.get<PaginatedResponse<ParkingSpace>>('/parking-spaces'),
   getById: (id: number) => api.get<ParkingSpace>(`/parking-spaces/${id}`),
-  getAvailable: () => api.get<ParkingSpace[]>('/parking-spaces/available'),
+  getAvailable: () => api.get<PaginatedResponse<ParkingSpace>>('/parking-spaces/available'),
   getAvailableCount: () => api.get<{ count: number }>('/parking-spaces/available-count'),
 }
 
