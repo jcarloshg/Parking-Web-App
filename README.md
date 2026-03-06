@@ -688,6 +688,34 @@ El proyecto se desarrolló en 13 fases progresivas, comenzando con la configurac
 
 ---
 
+## Datos de Prueba - Históricos
+
+El proyecto incluye un seeder integrado en `DatabaseSeeder` que genera datos realistas para meses históricos:
+
+- **Meses disponibles**: Febrero, Marzo, Junio 2026
+- ~20-50 tickets por día por mes
+- 5-15 tickets activos por día
+- Distribución realista de tipos de vehículo (auto/moto/camioneta)
+- ~10% de vehículos con estadía de 24-48 horas (tarifa diaria)
+- Pagos con método aleatorio (efectivo/tarjeta)
+
+### Comandos
+
+```bash
+# Ejecutar solo datos básicos (usuarios y espacios)
+docker compose exec backend php artisan migrate:fresh --seed
+
+# Seedear todos los datos históricos (Febrero, Marzo, Junio 2026)
+docker compose exec backend php artisan db:seed-historical --all
+
+# Seedear solo un mes específico
+docker compose exec backend php artisan db:seed-historical --february
+docker compose exec backend php artisan db:seed-historical --march
+docker compose exec backend php artisan db:seed-historical --june
+```
+
+---
+
 ## Tarifas
 
 | Tipo      | Por hora | Por día |
@@ -732,6 +760,9 @@ docker compose exec backend php artisan migrate
 
 # Refrescar base de datos
 docker compose exec backend php artisan migrate:fresh --seed
+
+# Seedear datos de Junio 2026 (tickets y pagos)
+docker compose exec backend php artisan db:seed --class=June2026Seeder
 
 # Acceder al contenedor backend
 docker compose exec backend sh
