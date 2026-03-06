@@ -2,6 +2,93 @@
 
 Sistema de gestión de estacionamiento con Laravel, Vue.js y MySQL.
 
+## Índice
+
+- [Capturas de Pantalla](#capturas-de-pantalla)
+- [Quick Start](#quick-start)
+- [Estructura del Proyecto](#estructura-del-proyecto)
+  - [Tech Stack](#tech-stack)
+- [Configuración](#configuración)
+  - [Puertos](#puertos)
+  - [Credenciales de Prueba](#credenciales-de-prueba)
+  - [Roles y Permisos](#roles-y-permisos)
+- [API Endpoints](#api-endpoints)
+  - [Autenticación](#autenticación)
+  - [Espacios de Estacionamiento](#espacios-de-estacionamiento)
+  - [Tickets](#tickets)
+  - [Pagos](#pagos)
+  - [Reportes](#reportes)
+  - [Usuarios](#usuarios)
+- [Fases de Desarrollo](#fases-de-desarrollo)
+  - [Phase 1: Setup y Configuración](#phase-1-setup-y-configuración)
+  - [Phase 2: Base de Datos y Modelos](#phase-2-base-de-datos-y-modelos)
+  - [Phase 3: Autenticación JWT](#phase-3-autenticación-jwt)
+  - [Phase 4: Gestión de Espacios](#phase-4-gestión-de-espacios)
+  - [Phase 5: Tickets API](#phase-5-tickets-api)
+  - [Phase 6: Pagos](#phase-6-pagos)
+  - [Phase 7: Reportes](#phase-7-reportes)
+  - [Phase 8: Frontend - Autenticación](#phase-8-frontend---autenticación)
+  - [Phase 9: Frontend - Dashboard](#phase-9-frontend---dashboard)
+  - [Phase 10: Frontend - Entry/Exit](#phase-10-frontend---entryexit)
+  - [Phase 11: Frontend - Reportes](#phase-11-frontend---reportes)
+  - [Phase 12: Frontend - Administración](#phase-12-frontend---administración)
+- [Datos de Prueba - Históricos](#datos-de-prueba---históricos)
+- [Comandos Útiles](#comandos-útiles)
+
+## Capturas de Pantalla
+
+### Dashboard (Admin)
+
+![Dashboard Admin](DOCS/media/dashboard-as-admin.png)
+
+### Registro de Entrada
+
+![Entrada](DOCS/media/view-entrada.png)
+
+### Registro de Salida
+
+![Salidas](DOCS/media/view-salidas.png)
+
+### Reportes Diarios
+
+![Reportes Diarios](DOCS/media/view-daily-reports.png)
+
+### Reportes Mensuales
+
+![Reportes Mensuales](DOCS/media/view-mensual-reprts.png)
+
+### Gestión de Espacios
+
+![Gestión de Espacios](DOCS/media/view-pagination-spaces.png)
+
+### Administración de Usuarios
+
+![Administración de Usuarios](DOCS/media/view-maanage-users.png)
+
+## Quick Start
+
+```bash
+# ─────────────────────────────────────
+# Docker
+# ─────────────────────────────────────
+
+# 1. Reiniciar contenedores con BASE DE DATOS NUEVA (borra todo)
+docker compose down -v && docker compose up -d
+
+# 2. IMPORTANTE: Si usas docker compose down -v, necesitas recrear la DB:
+docker compose exec backend php artisan migrate --force
+docker compose exec backend php artisan db:seed --force
+
+# 3. Seedear datos históricos (Enero, Febrero, Marzo 2026)
+docker compose exec backend php artisan db:seed-historical --all
+
+# Acceder al backend (API)
+curl http://localhost:8000
+
+# Acceder al frontend
+curl http://localhost:80
+```
+
 ## Estructura del Proyecto
 
 ```
@@ -13,7 +100,7 @@ parking-web-app/
 └── README.md
 ```
 
-## Tech Stack
+### Tech Stack
 
 - **Backend**: Laravel 12 + PHP 8.4
 - **Frontend**: Vue.js 3 + TypeScript + Vite
@@ -22,34 +109,17 @@ parking-web-app/
 - **State Management**: Pinia
 - **Container**: Docker
 
-## Quick Start
+## Configuración
 
-```bash
-# Iniciar contenedores
-docker compose up -d
+### Puertos
 
-# Verificar estado
-docker compose ps
+| Servicio | Puerto | Descripción        |
+| -------- | ------ | ------------------ |
+| Backend  | 8000   | Laravel API        |
+| Frontend | 80     | Vue.js SPA (nginx) |
+| Database | 3306   | MySQL 8.0          |
 
-# Acceder al backend (API)
-curl http://localhost:8000
-
-# Acceder al frontend (Vite dev server)
-curl http://localhost:5173
-
-# Acceder al frontend (Production)
-# El frontend en producción corre en nginx en el puerto 80
-```
-
-## Puertos
-
-| Servicio | Puerto |
-| -------- | ------ |
-| Backend  | 8000   |
-| Frontend | 5173   |
-| Database | 3306   |
-
-## Credenciales de Prueba
+### Credenciales de Prueba
 
 | Rol        | Email                  | Password |
 | ---------- | ---------------------- | -------- |
@@ -57,7 +127,7 @@ curl http://localhost:5173
 | Cajero     | cajero@parking.com     | password |
 | Supervisor | supervisor@parking.com | password |
 
-## Roles y Permisos
+### Roles y Permisos
 
 - **Admin**: Acceso completo (CRUD usuarios, espacios, reportes)
 - **Cajero**: Registro de entrada/salida, pagos
@@ -126,27 +196,6 @@ GET    /api/users/{id}      # Ver usuario
 PUT    /api/users/{id}      # Actualizar usuario
 DELETE /api/users/{id}      # Eliminar usuario
 ```
-
----
-
-## Frontend - Vistas
-
-| Ruta       | Descripción                     |
-| ---------- | ------------------------------- |
-| /login     | Inicio de sesión                |
-| /dashboard | Dashboard con stats y cajones   |
-| /entry     | Registro de entrada de vehículo |
-| /exit      | Registro de salida y pago       |
-| /reports   | Reportes (Admin/Supervisor)     |
-| /admin     | Administración (Admin)          |
-
-## Frontend - Componentes
-
-- **PlateInput**: Input para placa de vehículo (mayúsculas automáticas)
-- **VehicleSelect**: Selector de tipo de vehículo
-- **ParkingSpaceSelect**: Selector de cajón disponible
-- **PaymentForm**: Formulario de pago
-- **TicketCard**: Tarjeta de ticket con detalles
 
 ---
 
@@ -729,20 +778,6 @@ docker compose exec backend php artisan db:seed-historical --march
 
 ---
 
-## Tarifas
-
-| Tipo      | Por hora | Por día |
-| --------- | -------- | ------- |
-| Auto      | $20      | $150    |
-| Moto      | $10      | $80     |
-| Camioneta | $30      | $200    |
-
-- Tolerancia: 10 minutos = $0
-- Cobro por hora completa
-- Tarifa diaria después de 24h
-
----
-
 ## Comandos Útiles
 
 ```bash
@@ -785,30 +820,4 @@ cd frontend && npm run test
 
 # Build frontend
 cd frontend && npm run build
-```
-
-## Variables de Entorno
-
-```env
-# Application
-APP_ENV=local
-APP_DEBUG=true
-APP_URL=http://localhost:8000
-
-# Database
-DB_CONNECTION=mysql
-DB_HOST=database
-DB_PORT=3306
-DB_DATABASE=parking_db
-DB_USERNAME=parking_user
-DB_PASSWORD=parking_password
-
-# JWT
-JWT_SECRET=<generated>
-JWT_TTL=60
-JWT_REFRESH_TTL=20160
-
-# Frontend
-FRONTEND_PORT=5173
-VITE_API_URL=http://localhost:8000/api
 ```
