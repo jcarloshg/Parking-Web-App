@@ -746,36 +746,25 @@ docker compose exec backend php artisan db:seed-historical --march
 ## Comandos Útiles
 
 ```bash
-# Iniciar contenedores (primera vez o tras docker compose down sin -v)
-docker compose up -d
-
-# Verificar estado
-docker compose ps
-
-# Ver logs
-docker compose logs -f backend
-
-# Detener contenedores (mantiene datos)
-docker compose down
-
-# Reiniciar contenedores (mantiene datos)
-docker compose restart
-
-# Reiniciar contenedores con BASE DE DATOS NUEVA (borra todo)
+# 1. Reiniciar contenedores con BASE DE DATOS NUEVA (borra todo)
 docker compose down -v && docker compose up -d
 
-# IMPORTANTE: Si usas docker compose down -v, necesitas recrear la DB:
+# 2. IMPORTANTE: Si usas docker compose down -v, necesitas recrear la DB:
 docker compose exec backend php artisan migrate --force
 docker compose exec backend php artisan db:seed --force
 
-# Ejecutar migraciones
-docker compose exec backend php artisan migrate
+# 3. Seedear datos históricos (Enero, Febrero, Marzo 2026)
+docker compose exec backend php artisan db:seed-historical --all
+
+# ─────────────────────────────────────
+# other commands
+# ─────────────────────────────────────
 
 # Refrescar base de datos
 docker compose exec backend php artisan migrate:fresh --seed
 
-# Seedear datos históricos (Enero, Febrero, Marzo 2026)
-docker compose exec backend php artisan db:seed-historical --all
+# Ejecutar migraciones
+docker compose exec backend php artisan migrate
 
 # Seedear un mes específico
 docker compose exec backend php artisan db:seed-historical --january
