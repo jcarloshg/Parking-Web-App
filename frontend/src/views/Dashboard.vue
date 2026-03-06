@@ -73,7 +73,7 @@
           <h2>Estado de Cajones</h2>
           <div class="parking-grid">
             <div
-              v-for="space in paginatedParkingSpaces"
+              v-for="space in validParkingSpaces"
               :key="space.id"
               class="parking-space"
               :class="getStatusClass(space.status)"
@@ -165,12 +165,6 @@ const totalSpaces = ref(0)
 const validParkingSpaces = computed(() => {
   if (!parkingSpaces.value) return []
   return parkingSpaces.value.filter(space => space != null && typeof space.id === 'number')
-})
-
-const paginatedParkingSpaces = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value
-  const end = start + itemsPerPage.value
-  return validParkingSpaces.value.slice(start, end)
 })
 
 const totalPages = computed(() => Math.ceil(totalSpaces.value / itemsPerPage.value))
