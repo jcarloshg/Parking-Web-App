@@ -238,57 +238,50 @@ onUnmounted(() => {
 .dashboard-layout {
   display: flex;
   min-height: 100vh;
-  background-color: #f5f7fa;
+  background-color: #f3f4f6;
 }
 
 .sidebar {
   width: 250px;
-  background-color: #1e3a5f;
+  background-color: #1f2937;
   color: white;
   padding: 1rem 0;
-  display: flex;
-  flex-direction: column;
 }
 
-.logo {
-  padding: 1.5rem;
-  text-align: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+.sidebar .logo {
+  padding: 1rem;
+  border-bottom: 1px solid #374151;
 }
 
-.logo h2 {
+.sidebar .logo h2 {
   margin: 0;
-  font-size: 1.5rem;
+  color: #60a5fa;
 }
 
 .nav-menu {
-  flex: 1;
   padding: 1rem 0;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.875rem 1.5rem;
-  color: rgba(255, 255, 255, 0.7);
+  padding: 0.75rem 1rem;
+  color: #d1d5db;
   text-decoration: none;
-  transition: all 0.2s;
+  transition: background-color 0.2s;
 }
 
 .nav-item:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: white;
+  background-color: #374151;
 }
 
 .nav-item.active {
-  background-color: #2d5a8a;
+  background-color: #3b82f6;
   color: white;
-  border-left: 3px solid #4ade80;
 }
 
-.icon {
-  font-size: 1.25rem;
+.nav-item .icon {
+  margin-right: 0.5rem;
 }
 
 .main-content {
@@ -298,18 +291,17 @@ onUnmounted(() => {
 }
 
 .header {
-  background-color: white;
-  padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1rem 2rem;
+  background-color: white;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .header h1 {
   margin: 0;
   font-size: 1.5rem;
-  color: #1e3a5f;
 }
 
 .user-info {
@@ -320,35 +312,29 @@ onUnmounted(() => {
 
 .user-name {
   font-weight: 500;
-  color: #333;
 }
 
 .user-role {
+  color: #6b7280;
   font-size: 0.875rem;
-  color: #666;
-  background-color: #e5e7eb;
-  padding: 0.25rem 0.75rem;
-  border-radius: 1rem;
 }
 
 .logout-btn {
-  background-color: #dc3545;
+  padding: 0.5rem 1rem;
+  background-color: #ef4444;
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.875rem;
 }
 
 .logout-btn:hover {
-  background-color: #c82333;
+  background-color: #dc2626;
 }
 
 .content {
   flex: 1;
   padding: 2rem;
-  overflow-y: auto;
 }
 
 .stats-grid {
