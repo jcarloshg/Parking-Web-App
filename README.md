@@ -37,31 +37,69 @@ Sistema de gestión de estacionamiento con Laravel, Vue.js y MySQL.
 
 ## Capturas de Pantalla
 
+A continuación se presenta una evidencia visual de las principales funcionalidades del sistema:
+
+| Vista | Descripción |
+|-------|-------------|
+| **Dashboard** | Panel principal con estadísticas, grid de cajones y últimos tickets |
+| **Entrada** | Formulario para registrar vehículos entrantes |
+| **Salida** | Búsqueda por placa y procesamiento de pago |
+| **Reportes Diarios** | Resumen de ingresos y tickets del día |
+| **Reportes Mensuales** | Estadísticas mensuales con gráficos |
+| **Gestión de Espacios** | CRUD de cajones de estacionamiento |
+| **Administración de Usuarios** | Gestión de usuarios del sistema |
+
 ### Dashboard (Admin)
+
+Vista principal del dashboard donde se muestran las estadísticas en tiempo real, el estado de los cajones de estacionamiento y los últimos tickets activos.
 
 ![Dashboard Admin](DOCS/media/dashboard-as-admin.png)
 
+---
+
 ### Registro de Entrada
+
+Formulario para el registro de vehículos. Incluye selección de tipo de vehículo, asignación automática de cajón y validación de placa.
 
 ![Entrada](DOCS/media/view-entrada.png)
 
+---
+
 ### Registro de Salida
+
+Permite buscar un ticket por placa, visualizar el tiempo de estadía, calcular la tarifa correspondiente y procesar el pago.
 
 ![Salidas](DOCS/media/view-salidas.png)
 
+---
+
 ### Reportes Diarios
+
+Panel de reportes con información del día: ingresos totales, tickets atendidos, promedio por ticket y cajones disponibles.
 
 ![Reportes Diarios](DOCS/media/view-daily-reports.png)
 
+---
+
 ### Reportes Mensuales
+
+Estadísticas mensuales con gráficos de ingresos por día y distribución por tipo de vehículo.
 
 ![Reportes Mensuales](DOCS/media/view-mensual-reprts.png)
 
+---
+
 ### Gestión de Espacios
+
+Interfaz para administrar los cajones de estacionamiento con paginación, filtros y CRUD completo.
 
 ![Gestión de Espacios](DOCS/media/view-pagination-spaces.png)
 
+---
+
 ### Administración de Usuarios
+
+Panel para gestionar usuarios del sistema con creación, edición, eliminación y asignación de roles.
 
 ![Administración de Usuarios](DOCS/media/view-maanage-users.png)
 
