@@ -10,7 +10,9 @@ class UserController extends Controller
 {
     public function index()
     {
-        return response()->json(User::all());
+        $perPage = request()->get('per_page', 15);
+        $users = User::orderBy('created_at', 'desc')->paginate($perPage);
+        return response()->json($users);
     }
 
     public function store(Request $request)
@@ -19,7 +21,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6',
-            'role' => ['required', Rule::in(['admin', 'attendant'])],
+            'role' => ['required', Rule::in(['admin', 'cajero', 'supervisor'])],
         ]);
 
         $validated['password'] = bcrypt($validated['password']);
@@ -39,7 +41,7 @@ class UserController extends Controller
             'name' => 'sometimes|string|max:255',
             'email' => ['sometimes', 'email', Rule::unique('users')->ignore($user->id)],
             'password' => 'sometimes|string|min:6',
-            'role' => ['sometimes', Rule::in(['admin', 'attendant'])],
+            'role' => ['sometimes', Rule::in(['admin', 'cajero', 'supervisor'])],
         ]);
 
         if (isset($validated['password'])) {

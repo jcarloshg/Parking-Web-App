@@ -640,7 +640,15 @@ DELETE /api/users/{id}      # Eliminar usuario
 - [ ] Reporte mensual con gráficos
 - [ ] Exportación a PDF/Excel
 
-### Phase 12: Frontend - Administración (pendiente)
+### Phase 12: Frontend - Administración (completado)
+
+- [x] Users Management: Listado, Crear, Editar, Eliminar
+- [x] Parking Spaces Management: Listado, Crear, Editar, Eliminar
+- [x] Modal forms para crear/editar
+- [x] Confirmación de eliminación
+- [x] Permisos: Solo admin tiene acceso
+- [x] API: GET/POST/PUT/DELETE /api/users
+- [x] API: CRUD /api/parking-spaces
 
 - [ ] Gestión de usuarios (CRUD)
 - [ ] Gestión de espacios (CRUD)
