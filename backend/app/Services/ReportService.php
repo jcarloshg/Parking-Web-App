@@ -23,6 +23,7 @@ class ReportService
         $ticketsActivos = Ticket::where('status', 'activo')->count();
 
         $ticketsDelDia = Ticket::whereDate('entry_time', $date)
+            ->orWhereDate('exit_time', $date)
             ->with(['parkingSpace', 'payment'])
             ->orderBy('entry_time', 'desc')
             ->get();

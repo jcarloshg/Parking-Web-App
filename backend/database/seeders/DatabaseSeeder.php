@@ -69,21 +69,22 @@ class DatabaseSeeder extends Seeder
 
     private function seedParkingSpaces(): void
     {
-        $spaces = [
-            ['number' => 'A1', 'type' => 'general', 'status' => 'disponible'],
-            ['number' => 'A2', 'type' => 'general', 'status' => 'disponible'],
-            ['number' => 'A3', 'type' => 'general', 'status' => 'disponible'],
-            ['number' => 'A4', 'type' => 'general', 'status' => 'disponible'],
-            ['number' => 'A5', 'type' => 'general', 'status' => 'disponible'],
-            ['number' => 'B1', 'type' => 'general', 'status' => 'disponible'],
-            ['number' => 'B2', 'type' => 'general', 'status' => 'disponible'],
-            ['number' => 'B3', 'type' => 'general', 'status' => 'disponible'],
-            ['number' => 'B4', 'type' => 'general', 'status' => 'disponible'],
-            ['number' => 'E1', 'type' => 'eléctrico', 'status' => 'disponible'],
-            ['number' => 'E2', 'type' => 'eléctrico', 'status' => 'disponible'],
-            ['number' => 'D1', 'type' => 'discapacitado', 'status' => 'disponible'],
-            ['number' => 'D2', 'type' => 'discapacitado', 'status' => 'disponible'],
-        ];
+        $spaces = [];
+
+        $rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
+        foreach ($rows as $row) {
+            for ($i = 1; $i <= 10; $i++) {
+                $spaces[] = ['number' => $row . $i, 'type' => 'general', 'status' => 'disponible'];
+            }
+        }
+
+        for ($i = 1; $i <= 5; $i++) {
+            $spaces[] = ['number' => 'ELEC-' . $i, 'type' => 'eléctrico', 'status' => 'disponible'];
+        }
+
+        for ($i = 1; $i <= 5; $i++) {
+            $spaces[] = ['number' => 'DISC-' . $i, 'type' => 'discapacitado', 'status' => 'disponible'];
+        }
 
         foreach ($spaces as $space) {
             ParkingSpace::create($space);

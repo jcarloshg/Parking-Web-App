@@ -107,6 +107,7 @@
 
             <div v-if="dailyLoading" class="loading">Cargando...</div>
             <div v-else-if="dailyError" class="error">{{ dailyError }}</div>
+            <div v-else-if="!dailyReport" class="no-data">Selecciona una fecha para ver el reporte</div>
             <div v-else-if="dailyReport" class="report-content">
               <div class="stats-grid">
                 <div class="stat-card">

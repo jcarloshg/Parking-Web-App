@@ -33,6 +33,18 @@ export interface DailyReport {
   cajones_disponibles: number
   tickets_activos: number
   fecha: string
+  tipos_vehiculo: Record<string, number>
+  tickets: Array<{
+    id: number
+    plate_number: string
+    vehicle_type: string
+    entry_time: string
+    exit_time: string | null
+    parking_space: string | null
+    status: string
+    total: number | null
+    payment_method: string | null
+  }>
 }
 
 export interface MonthlyReport {
