@@ -2,6 +2,12 @@
   <div class="dashboard-layout">
     <aside class="sidebar">
       <div class="logo">
+        <div class="logo-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="9" y1="3" x2="9" y2="21"></line>
+          </svg>
+        </div>
         <h2>Parking</h2>
       </div>
       <nav class="nav-menu">
@@ -67,7 +73,7 @@
           <h2>Estado de Cajones</h2>
           <div class="parking-grid">
             <div
-              v-for="space in validParkingSpaces"
+              v-for="space in paginatedParkingSpaces"
               :key="space.id"
               class="parking-space"
               :class="getStatusClass(space.status)"
@@ -76,6 +82,25 @@
               <span class="space-type">{{ getTypeLabel(space.type) }}</span>
               <span class="space-status">{{ getStatusLabel(space.status) }}</span>
             </div>
+          </div>
+          <div class="pagination" v-if="totalPages > 1">
+            <button 
+              @click="changePage(currentPage - 1)" 
+              :disabled="currentPage === 1"
+              class="pagination-btn"
+            >
+              Anterior
+            </button>
+            <span class="pagination-info">
+              Página {{ currentPage }} de {{ totalPages }}
+            </span>
+            <button 
+              @click="changePage(currentPage + 1)" 
+              :disabled="currentPage === totalPages"
+              class="pagination-btn"
+            >
+              Siguiente
+            </button>
           </div>
         </div>
 
@@ -133,10 +158,22 @@ const lastUpdate = ref('')
 const refreshInterval = ref<number | null>(null)
 const isLoading = ref(true)
 
+const currentPage = ref(1)
+const itemsPerPage = ref(20)
+const totalSpaces = ref(0)
+
 const validParkingSpaces = computed(() => {
   if (!parkingSpaces.value) return []
   return parkingSpaces.value.filter(space => space != null && typeof space.id === 'number')
 })
+
+const paginatedParkingSpaces = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value
+  const end = start + itemsPerPage.value
+  return validParkingSpaces.value.slice(start, end)
+})
+
+const totalPages = computed(() => Math.ceil(totalSpaces.value / itemsPerPage.value))
 
 const validTickets = computed(() => {
   if (!summary.value?.ultimos_tickets) return []
@@ -202,16 +239,24 @@ const loadData = async () => {
   try {
     isLoading.value = true
     const [spacesRes, summaryRes] = await Promise.all([
-      parkingApi.getAll(),
+      parkingApi.getAll({ params: { page: currentPage.value, per_page: itemsPerPage.value } }),
       reportsApi.getSummary()
     ])
     parkingSpaces.value = (spacesRes.data.data ?? []).filter(space => space && space.id)
+    totalSpaces.value = spacesRes.data.total ?? 0
     summary.value = summaryRes.data
     lastUpdate.value = new Date().toLocaleTimeString('es-MX')
   } catch (err) {
     console.error('Failed to load dashboard data:', err)
   } finally {
     isLoading.value = false
+  }
+}
+
+const changePage = (page: number) => {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page
+    loadData()
   }
 }
 
@@ -238,50 +283,71 @@ onUnmounted(() => {
 .dashboard-layout {
   display: flex;
   min-height: 100vh;
-  background-color: #f3f4f6;
+  background-color: #f8fafc;
 }
 
 .sidebar {
-  width: 250px;
-  background-color: #1f2937;
+  width: 260px;
+  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 1rem 0;
+  padding: 1.5rem 0;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar .logo {
-  padding: 1rem;
-  border-bottom: 1px solid #374151;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sidebar .logo-icon {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sidebar .logo h2 {
   margin: 0;
-  color: #60a5fa;
+  font-size: 1.25rem;
+  font-weight: 600;
 }
 
 .nav-menu {
   padding: 1rem 0;
+  margin-top: 1rem;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  padding: 0.75rem 1rem;
-  color: #d1d5db;
+  gap: 0.75rem;
+  padding: 0.875rem 1.5rem;
+  color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  margin: 0.25rem 0.75rem;
+  border-radius: 10px;
 }
 
 .nav-item:hover {
-  background-color: #374151;
-}
-
-.nav-item.active {
-  background-color: #3b82f6;
+  background-color: rgba(255, 255, 255, 0.15);
   color: white;
 }
 
+.nav-item.active {
+  background-color: white;
+  color: #667eea;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
 .nav-item .icon {
-  margin-right: 0.5rem;
+  font-size: 1.25rem;
 }
 
 .main-content {
@@ -294,14 +360,17 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
+  padding: 1.25rem 2rem;
   background-color: white;
   border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .header h1 {
   margin: 0;
   font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
 }
 
 .user-info {
@@ -311,25 +380,33 @@ onUnmounted(() => {
 }
 
 .user-name {
-  font-weight: 500;
+  font-weight: 600;
+  color: #1f2937;
 }
 
 .user-role {
-  color: #6b7280;
+  color: #667eea;
   font-size: 0.875rem;
+  font-weight: 500;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
 }
 
 .logout-btn {
-  padding: 0.5rem 1rem;
-  background-color: #ef4444;
+  padding: 0.625rem 1.25rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 10px;
+  font-weight: 500;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .logout-btn:hover {
-  background-color: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 .content {
@@ -346,35 +423,40 @@ onUnmounted(() => {
 
 .stat-card {
   background: white;
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 1.5rem;
   display: flex;
   align-items: center;
-  gap: 1rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  gap: 1.25rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .stat-icon {
-  font-size: 2.5rem;
-  width: 60px;
-  height: 60px;
+  width: 64px;
+  height: 64px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f3f4f6;
-  border-radius: 12px;
+  border-radius: 16px;
+  font-size: 1.75rem;
 }
 
 .stat-card.income .stat-icon {
-  background-color: #dcfce7;
+  background: linear-gradient(135deg, #dcfce7 0%, #86efac 100%);
 }
 
 .stat-card.tickets .stat-icon {
-  background-color: #dbeafe;
+  background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%);
 }
 
 .stat-card.spaces .stat-icon {
-  background-color: #fef3c7;
+  background: linear-gradient(135deg, #fef3c7 0%, #fcd34d 100%);
 }
 
 .stat-info h3 {
@@ -388,21 +470,22 @@ onUnmounted(() => {
   margin: 0;
   font-size: 1.75rem;
   font-weight: 700;
-  color: #111827;
+  color: #1f2937;
 }
 
 .parking-section {
   background: white;
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   margin-bottom: 2rem;
 }
 
 .parking-section h2 {
-  margin: 0 0 1rem 0;
+  margin: 0 0 1.25rem 0;
   font-size: 1.25rem;
-  color: #1e3a5f;
+  color: #1f2937;
+  font-weight: 600;
 }
 
 .parking-grid {
@@ -413,14 +496,14 @@ onUnmounted(() => {
 
 .parking-space {
   aspect-ratio: 1;
-  border-radius: 8px;
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 0.25rem;
   padding: 0.5rem;
-  transition: transform 0.2s;
+  transition: all 0.2s ease;
 }
 
 .parking-space:hover {
@@ -428,17 +511,17 @@ onUnmounted(() => {
 }
 
 .status-available {
-  background-color: #dcfce7;
+  background: linear-gradient(135deg, #dcfce7 0%, #86efac 100%);
   border: 2px solid #22c55e;
 }
 
 .status-occupied {
-  background-color: #fee2e2;
+  background: linear-gradient(135deg, #fee2e2 0%, #fca5a5 100%);
   border: 2px solid #ef4444;
 }
 
 .status-disabled {
-  background-color: #e5e7eb;
+  background: linear-gradient(135deg, #f3f4f6 0%, #d1d5db 100%);
   border: 2px solid #9ca3af;
 }
 
@@ -460,20 +543,23 @@ onUnmounted(() => {
 
 .last-ticket-section {
   background: white;
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   margin-bottom: 2rem;
 }
 
 .last-ticket-section h2 {
-  margin: 0 0 1rem 0;
+  margin: 0 0 1.25rem 0;
   font-size: 1.25rem;
-  color: #1e3a5f;
+  color: #1f2937;
+  font-weight: 600;
 }
 
 .tickets-table {
   overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
 }
 
 .tickets-table table {
@@ -483,7 +569,7 @@ onUnmounted(() => {
 
 .tickets-table th,
 .tickets-table td {
-  padding: 0.75rem 1rem;
+  padding: 1rem;
   text-align: left;
   border-bottom: 1px solid #e5e7eb;
 }
@@ -518,5 +604,41 @@ onUnmounted(() => {
   height: 200px;
   color: #6b7280;
   font-size: 1.125rem;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.pagination-btn {
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  color: #6b7280;
+  font-size: 0.875rem;
 }
 </style>

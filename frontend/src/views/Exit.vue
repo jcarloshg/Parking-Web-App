@@ -2,6 +2,12 @@
   <div class="dashboard-layout">
     <aside class="sidebar">
       <div class="logo">
+        <div class="logo-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="9" y1="3" x2="9" y2="21"></line>
+          </svg>
+        </div>
         <h2>Parking</h2>
       </div>
       <nav class="nav-menu">
@@ -296,7 +302,6 @@ const resetForm = () => {
 .exit-page {
   max-width: 600px;
   margin: 0 auto;
-  padding: 2rem;
 }
 
 .page-header {
@@ -304,20 +309,22 @@ const resetForm = () => {
   margin-bottom: 2rem;
 }
 
-h1 {
-  color: #333;
+.page-header h1 {
+  color: #1f2937;
+  font-weight: 700;
   margin-bottom: 0.5rem;
 }
 
 .subtitle {
-  color: #666;
+  color: #6b7280;
+  font-size: 1rem;
 }
 
 .search-container {
   background: white;
   padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .search-form {
@@ -334,200 +341,238 @@ h1 {
 }
 
 .search-button {
-  padding: 0.75rem 1.5rem;
-  background-color: #007bff;
+  padding: 0.875rem 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 10px;
   font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
 }
 
 .search-button:hover:not(:disabled) {
-  background-color: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 .search-button:disabled {
-  background-color: #ccc;
+  opacity: 0.7;
   cursor: not-allowed;
 }
 
 .error-message {
-  color: #dc3545;
-  padding: 0.75rem;
-  background-color: #f8d7da;
-  border-radius: 4px;
-  border: 1px solid #f5c6cb;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #dc2626;
+  font-size: 0.875rem;
+  padding: 0.75rem 1rem;
+  background-color: #fef2f2;
+  border-radius: 10px;
+  border: 1px solid #fecaca;
 }
 
 .not-found-message {
-  color: #856404;
-  padding: 0.75rem;
-  background-color: #fff3cd;
-  border-radius: 4px;
-  border: 1px solid #ffeaa7;
+  color: #92400e;
+  padding: 0.75rem 1rem;
+  background-color: #fef3c7;
+  border-radius: 10px;
+  border: 1px solid #fcd34d;
   text-align: center;
 }
 
 .payment-container {
   background: white;
   padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
 .calculation-details {
-  padding: 1rem;
-  background-color: #f8f9fa;
-  border-radius: 4px;
+  padding: 1.25rem;
+  background-color: #f9fafb;
+  border-radius: 12px;
 }
 
 .calculation-details h3 {
   margin: 0 0 1rem;
-  color: #333;
+  color: #1f2937;
+  font-weight: 600;
 }
 
 .detail-row {
   display: flex;
   justify-content: space-between;
   padding: 0.5rem 0;
+  color: #4b5563;
 }
 
 .detail-row.total {
-  border-top: 2px solid #007bff;
-  font-weight: bold;
+  border-top: 2px solid #667eea;
+  font-weight: 700;
   font-size: 1.1rem;
   margin-top: 0.5rem;
   padding-top: 1rem;
+  color: #1f2937;
 }
 
 .calculating {
   text-align: center;
-  color: #666;
+  color: #6b7280;
   padding: 1rem;
 }
 
 .receipt-container {
   background: white;
   padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   text-align: center;
 }
 
 .success-icon {
-  width: 60px;
-  height: 60px;
-  background-color: #28a745;
+  width: 72px;
+  height: 72px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 2rem;
-  margin: 0 auto 1rem;
+  margin: 0 auto 1.25rem;
+  box-shadow: 0 10px 20px -10px rgba(102, 126, 234, 0.5);
 }
 
 h2 {
-  color: #28a745;
+  color: #1f2937;
   margin-bottom: 1.5rem;
+  font-weight: 700;
 }
 
 .receipt {
-  border: 2px dashed #ddd;
-  border-radius: 8px;
+  border: 2px dashed #e5e7eb;
+  border-radius: 12px;
   padding: 1.5rem;
   margin: 1.5rem 0;
   text-align: left;
+  background-color: #f9fafb;
 }
 
 .receipt h3 {
   text-align: center;
   margin: 0 0 1rem;
-  color: #333;
+  color: #1f2937;
+  font-weight: 600;
 }
 
 .receipt-row {
   display: flex;
   justify-content: space-between;
   padding: 0.5rem 0;
+  color: #4b5563;
 }
 
 .receipt-row.total {
-  border-top: 2px solid #333;
-  font-weight: bold;
+  border-top: 2px solid #667eea;
+  font-weight: 700;
   font-size: 1.2rem;
   margin-top: 0.5rem;
   padding-top: 1rem;
+  color: #1f2937;
 }
 
 .reset-button {
-  padding: 0.75rem 1.5rem;
-  background-color: #6c757d;
+  padding: 0.875rem 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 10px;
   font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
 }
 
 .reset-button:hover {
-  background-color: #5a6268;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 .dashboard-layout {
   display: flex;
   min-height: 100vh;
-  background-color: #f3f4f6;
+  background-color: #f8fafc;
 }
 
 .sidebar {
-  width: 250px;
-  background-color: #1f2937;
+  width: 260px;
+  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 1rem 0;
+  padding: 1.5rem 0;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar .logo {
-  padding: 1rem;
-  border-bottom: 1px solid #374151;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sidebar .logo-icon {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sidebar .logo h2 {
   margin: 0;
-  color: #60a5fa;
+  font-size: 1.25rem;
+  font-weight: 600;
 }
 
 .nav-menu {
   padding: 1rem 0;
+  margin-top: 1rem;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  padding: 0.75rem 1rem;
-  color: #d1d5db;
+  gap: 0.75rem;
+  padding: 0.875rem 1.5rem;
+  color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  margin: 0.25rem 0.75rem;
+  border-radius: 10px;
 }
 
 .nav-item:hover {
-  background-color: #374151;
-}
-
-.nav-item.active {
-  background-color: #3b82f6;
+  background-color: rgba(255, 255, 255, 0.15);
   color: white;
 }
 
+.nav-item.active {
+  background-color: white;
+  color: #667eea;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
 .nav-item .icon {
-  margin-right: 0.5rem;
+  font-size: 1.25rem;
 }
 
 .main-content {
@@ -540,14 +585,17 @@ h2 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
+  padding: 1.25rem 2rem;
   background-color: white;
   border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .header h1 {
   margin: 0;
   font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
 }
 
 .user-info {
@@ -557,48 +605,37 @@ h2 {
 }
 
 .user-name {
-  font-weight: 500;
+  font-weight: 600;
+  color: #1f2937;
 }
 
 .user-role {
-  color: #6b7280;
+  color: #667eea;
   font-size: 0.875rem;
+  font-weight: 500;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
 }
 
 .logout-btn {
-  padding: 0.5rem 1rem;
-  background-color: #ef4444;
+  padding: 0.625rem 1.25rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 10px;
+  font-weight: 500;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .logout-btn:hover {
-  background-color: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 .content {
   flex: 1;
   padding: 2rem;
-}
-
-.exit-page {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.page-header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.page-header h1 {
-  color: #333;
-  margin-bottom: 0.5rem;
-}
-
-.subtitle {
-  color: #666;
 }
 </style>

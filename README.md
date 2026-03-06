@@ -346,6 +346,7 @@ El proyecto se desarrolló en 13 fases progresivas, comenzando con la configurac
    - Cambio de status del cajón (disponible → ocupado → disponible)
 
 3. **Rutas API**:
+
    ```
    GET    /api/tickets                 # Listar (público)
    POST   /api/tickets                 # Crear ticket (Auth)
@@ -366,6 +367,7 @@ El proyecto se desarrolló en 13 fases progresivas, comenzando con la configurac
    - TicketServiceTest (11 casos)
 
 **Entregables**:
+
 - Registro de entrada funcionando
 - Búsqueda de tickets por placa
 - Tickets activos listados
@@ -400,6 +402,7 @@ El proyecto se desarrolló en 13 fases progresivas, comenzando con la configurac
    - Métodos: getAll(), getById(), getToday(), calculateFee(), processPayment()
 
 4. **Rutas API**:
+
    ```
    GET    /api/payments                 # Listar pagos (público)
    POST   /api/payments                 # Registrar pago (Auth)
@@ -417,6 +420,7 @@ El proyecto se desarrolló en 13 fases progresivas, comenzando con la configurac
    - PaymentApiTest (10 casos - 7 passing)
 
 **Entregables**:
+
 - Cálculo de tarifas funcionando
 - Tolerancia de 10 minutos
 - Tarifas diferenciadas por tipo de vehículo
@@ -440,6 +444,7 @@ El proyecto se desarrolló en 13 fases progresivas, comenzando con la configurac
    - Métodos: getDailyReport(), getMonthlyReport(), getDashboardSummary(), canAccessReports()
 
 3. **Rutas API**:
+
    ```
    GET /api/reports/daily          # Reporte diario (Admin/Supervisor)
    GET /api/reports/monthly        # Reporte mensual (Admin/Supervisor)
@@ -474,6 +479,7 @@ El proyecto se desarrolló en 13 fases progresivas, comenzando con la configurac
    - ReportApiTest (11 casos - todos passing)
 
 **Entregables**:
+
 - Reporte diario completo
 - Reporte mensual con agregaciones
 - Dashboard summary público
@@ -521,6 +527,7 @@ El proyecto se desarrolló en 13 fases progresivas, comenzando con la configurac
    - Redirect a /login
 
 **Archivos creados**:
+
 - frontend/src/api/index.ts
 - frontend/src/api/auth.ts
 - frontend/src/stores/auth.ts
@@ -535,6 +542,7 @@ El proyecto se desarrolló en 13 fases progresivas, comenzando con la configurac
 - frontend/.env
 
 **Entregables**:
+
 - Login funcional
 - JWT almacenado y enviado en requests
 - Protección de rutas
@@ -568,11 +576,13 @@ El proyecto se desarrolló en 13 fases progresivas, comenzando con la configurac
    - Actualización cada 30 segundos
 
 **Archivos creados/actualizados**:
+
 - frontend/src/views/Dashboard.vue
 - frontend/src/api/parking.ts (reportsApi)
 - frontend/src/api/reports.ts
 
 **Entregables**:
+
 - Dashboard con stats en tiempo real
 - Grid visual de cajones
 - Tabla de últimos tickets con hora de salida
@@ -627,6 +637,7 @@ El proyecto se desarrolló en 13 fases progresivas, comenzando con la configurac
    - Admin, Cajero, Supervisor: entrada y salida
 
 **Entregables**:
+
 - Registro de entrada funcionando
 - Búsqueda de ticket por placa
 - Cálculo y pago de tarifa
@@ -667,6 +678,7 @@ El proyecto se desarrolló en 13 fases progresivas, comenzando con la configurac
 ### Phase 13: Testing
 
 **Backend - PHPUnit**:
+
 - [x] AuthApiTest (10 casos)
 - [x] ParkingSpaceApiTest (12 casos)
 - [x] TicketApiTest (12 casos)
@@ -676,6 +688,7 @@ El proyecto se desarrolló en 13 fases progresivas, comenzando con la configurac
 - [x] Service Tests (Auth, ParkingSpace, Ticket, FeeCalculator)
 
 **Frontend - Vitest**:
+
 - [x] auth.spec.ts
 - [x] Dashboard.spec.ts
 - [x] StatsCards.spec.ts
@@ -703,9 +716,9 @@ El proyecto incluye un seeder integrado en `DatabaseSeeder` que genera datos rea
 
 ```bash
 # Ejecutar solo datos básicos (usuarios y espacios)
-docker compose exec backend php artisan migrate:fresh --seed
-
 # Seedear todos los datos históricos (Enero, Febrero, Marzo 2026)
+docker compose exec backend php artisan migrate:fresh --seed
+docker compose exec backend php artisan db:seed
 docker compose exec backend php artisan db:seed-historical --all
 
 # Seedear solo un mes específico
@@ -810,7 +823,3 @@ JWT_REFRESH_TTL=20160
 FRONTEND_PORT=5173
 VITE_API_URL=http://localhost:8000/api
 ```
-
-## Licencia
-
-MIT

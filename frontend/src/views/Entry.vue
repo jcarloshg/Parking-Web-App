@@ -2,6 +2,12 @@
   <div class="dashboard-layout">
     <aside class="sidebar">
       <div class="logo">
+        <div class="logo-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="9" y1="3" x2="9" y2="21"></line>
+          </svg>
+        </div>
         <h2>Parking</h2>
       </div>
       <nav class="nav-menu">
@@ -268,8 +274,8 @@ const resetForm = () => {
 .entry-form-container {
   background: white;
   padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
 
 .page-header {
@@ -278,18 +284,20 @@ const resetForm = () => {
 }
 
 .page-header h1 {
-  color: #333;
+  color: #1f2937;
   margin-bottom: 0.5rem;
+  font-size: 1.75rem;
+  font-weight: 700;
 }
 
 .subtitle {
-  color: #666;
+  color: #6b7280;
 }
 
 .entry-form {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
 
 .form-row {
@@ -298,47 +306,52 @@ const resetForm = () => {
 }
 
 .error-message {
-  color: #dc3545;
-  padding: 0.75rem;
-  background-color: #f8d7da;
-  border-radius: 4px;
-  border: 1px solid #f5c6cb;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #dc2626;
+  font-size: 0.875rem;
+  padding: 0.75rem 1rem;
+  background-color: #fef2f2;
+  border-radius: 10px;
+  border: 1px solid #fecaca;
 }
 
 .submit-button {
+  width: 100%;
   padding: 1rem;
-  background-color: #007bff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  border-radius: 4px;
-  font-size: 1.1rem;
+  border-radius: 10px;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
-  margin-top: 1rem;
+  transition: all 0.2s ease;
 }
 
 .submit-button:hover:not(:disabled) {
-  background-color: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px -10px rgba(102, 126, 234, 0.5);
 }
 
 .submit-button:disabled {
-  background-color: #ccc;
+  opacity: 0.7;
   cursor: not-allowed;
 }
 
 .success-container {
   background: white;
   padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   text-align: center;
 }
 
 .success-icon {
   width: 60px;
   height: 60px;
-  background-color: #28a745;
+  background-color: #10b981;
   color: white;
   border-radius: 50%;
   display: flex;
@@ -349,77 +362,99 @@ const resetForm = () => {
 }
 
 h2 {
-  color: #28a745;
+  color: #10b981;
   margin-bottom: 1.5rem;
 }
 
 .success-message {
-  color: #666;
+  color: #6b7280;
   margin: 1.5rem 0;
 }
 
 .reset-button {
   padding: 0.75rem 1.5rem;
-  background-color: #6c757d;
+  background-color: #6b7280;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 10px;
   font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
 }
 
 .reset-button:hover {
-  background-color: #5a6268;
+  background-color: #4b5563;
 }
 
 .dashboard-layout {
   display: flex;
   min-height: 100vh;
-  background-color: #f3f4f6;
+  background-color: #f8fafc;
 }
 
 .sidebar {
-  width: 250px;
-  background-color: #1f2937;
+  width: 260px;
+  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 1rem 0;
+  padding: 1.5rem 0;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar .logo {
-  padding: 1rem;
-  border-bottom: 1px solid #374151;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sidebar .logo-icon {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sidebar .logo h2 {
   margin: 0;
-  color: #60a5fa;
+  font-size: 1.25rem;
+  font-weight: 600;
 }
 
 .nav-menu {
   padding: 1rem 0;
+  margin-top: 1rem;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  padding: 0.75rem 1rem;
-  color: #d1d5db;
+  gap: 0.75rem;
+  padding: 0.875rem 1.5rem;
+  color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  margin: 0.25rem 0.75rem;
+  border-radius: 10px;
 }
 
 .nav-item:hover {
-  background-color: #374151;
-}
-
-.nav-item.active {
-  background-color: #3b82f6;
+  background-color: rgba(255, 255, 255, 0.15);
   color: white;
 }
 
+.nav-item.active {
+  background-color: white;
+  color: #667eea;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
 .nav-item .icon {
-  margin-right: 0.5rem;
+  font-size: 1.25rem;
 }
 
 .main-content {
@@ -432,14 +467,17 @@ h2 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
+  padding: 1.25rem 2rem;
   background-color: white;
   border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .header h1 {
   margin: 0;
   font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
 }
 
 .user-info {
@@ -449,25 +487,33 @@ h2 {
 }
 
 .user-name {
-  font-weight: 500;
+  font-weight: 600;
+  color: #1f2937;
 }
 
 .user-role {
-  color: #6b7280;
+  color: #667eea;
   font-size: 0.875rem;
+  font-weight: 500;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
 }
 
 .logout-btn {
-  padding: 0.5rem 1rem;
-  background-color: #ef4444;
+  padding: 0.625rem 1.25rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 10px;
+  font-weight: 500;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .logout-btn:hover {
-  background-color: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 .content {

@@ -2,6 +2,12 @@
   <div class="dashboard-layout">
     <aside class="sidebar">
       <div class="logo">
+        <div class="logo-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="9" y1="3" x2="9" y2="21"></line>
+          </svg>
+        </div>
         <h2>Parking</h2>
       </div>
       <nav class="nav-menu">
@@ -614,50 +620,71 @@ onMounted(() => {
 .dashboard-layout {
   display: flex;
   min-height: 100vh;
-  background-color: #f3f4f6;
+  background-color: #f8fafc;
 }
 
 .sidebar {
-  width: 250px;
-  background-color: #1f2937;
+  width: 260px;
+  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 1rem 0;
+  padding: 1.5rem 0;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar .logo {
-  padding: 1rem;
-  border-bottom: 1px solid #374151;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sidebar .logo-icon {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sidebar .logo h2 {
   margin: 0;
-  color: #60a5fa;
+  font-size: 1.25rem;
+  font-weight: 600;
 }
 
 .nav-menu {
   padding: 1rem 0;
+  margin-top: 1rem;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  padding: 0.75rem 1rem;
-  color: #d1d5db;
+  gap: 0.75rem;
+  padding: 0.875rem 1.5rem;
+  color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  margin: 0.25rem 0.75rem;
+  border-radius: 10px;
 }
 
 .nav-item:hover {
-  background-color: #374151;
-}
-
-.nav-item.active {
-  background-color: #3b82f6;
+  background-color: rgba(255, 255, 255, 0.15);
   color: white;
 }
 
+.nav-item.active {
+  background-color: white;
+  color: #667eea;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
 .nav-item .icon {
-  margin-right: 0.5rem;
+  font-size: 1.25rem;
 }
 
 .main-content {
@@ -670,14 +697,17 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
+  padding: 1.25rem 2rem;
   background-color: white;
   border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .header h1 {
   margin: 0;
   font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
 }
 
 .user-info {
@@ -687,25 +717,33 @@ onMounted(() => {
 }
 
 .user-name {
-  font-weight: 500;
+  font-weight: 600;
+  color: #1f2937;
 }
 
 .user-role {
-  color: #6b7280;
+  color: #667eea;
   font-size: 0.875rem;
+  font-weight: 500;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
 }
 
 .logout-btn {
-  padding: 0.5rem 1rem;
-  background-color: #ef4444;
+  padding: 0.625rem 1.25rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 10px;
+  font-weight: 500;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .logout-btn:hover {
-  background-color: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 .content {
@@ -717,54 +755,66 @@ onMounted(() => {
   text-align: center;
   padding: 3rem;
   background: white;
-  border-radius: 8px;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .access-denied h2 {
   color: #dc2626;
+  margin-bottom: 1rem;
 }
 
 .back-link {
   display: inline-block;
   margin-top: 1rem;
-  padding: 0.5rem 1rem;
-  background-color: #3b82f6;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   text-decoration: none;
-  border-radius: 4px;
+  border-radius: 10px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.back-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 .reports-page {
   background: white;
-  border-radius: 8px;
-  padding: 1.5rem;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .tabs {
   display: flex;
   gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
   border-bottom: 1px solid #e5e7eb;
 }
 
 .tab {
-  padding: 0.75rem 1.5rem;
+  padding: 0.875rem 1.5rem;
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
   cursor: pointer;
   font-size: 1rem;
+  font-weight: 500;
   color: #6b7280;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
 .tab:hover {
-  color: #3b82f6;
+  color: #667eea;
 }
 
 .tab.active {
-  color: #3b82f6;
-  border-bottom-color: #3b82f6;
+  color: #667eea;
+  border-bottom-color: #667eea;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
 }
 
 .filters {
@@ -778,61 +828,87 @@ onMounted(() => {
   align-items: center;
   gap: 0.5rem;
   font-weight: 500;
+  color: #374151;
 }
 
 .filters input,
 .filters select {
-  padding: 0.5rem;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  background-color: #f9fafb;
+}
+
+.filters input:focus,
+.filters select:focus {
+  outline: none;
+  border-color: #667eea;
+  background-color: white;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
 }
 
 .loading,
 .error {
   text-align: center;
   padding: 2rem;
+  color: #6b7280;
 }
 
 .error {
   color: #dc2626;
+  background-color: #fef2f2;
+  border-radius: 10px;
+  border: 1px solid #fecaca;
 }
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
   margin-bottom: 2rem;
-}
-
-@media (max-width: 640px) {
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 .stat-card {
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 1rem;
-  background: #f9fafb;
-  border-radius: 8px;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  border-radius: 16px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1);
 }
 
 .stat-icon {
-  font-size: 2rem;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  font-size: 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
 }
 
 .stat-info h3 {
   margin: 0;
   font-size: 0.875rem;
   color: #6b7280;
+  font-weight: 500;
 }
 
 .stat-value {
   margin: 0.25rem 0 0;
   font-size: 1.5rem;
-  font-weight: bold;
+  font-weight: 700;
   color: #1f2937;
 }
 
@@ -844,9 +920,9 @@ onMounted(() => {
 
 .chart-container {
   background: white;
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   border: 1px solid #e5e7eb;
 }
 
@@ -866,6 +942,8 @@ onMounted(() => {
   text-align: center;
   color: #9ca3af;
   padding: 2rem;
+  background-color: #f9fafb;
+  border-radius: 12px;
 }
 
 .vehicle-types {
@@ -916,38 +994,40 @@ onMounted(() => {
 .tickets-table {
   margin-top: 2rem;
   overflow-x: auto;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
 }
 
 .tickets-table h3 {
   margin: 0 0 1rem;
   color: #1f2937;
+  font-weight: 600;
 }
 
 .tickets-table table {
   width: 100%;
   border-collapse: collapse;
   background: white;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .tickets-table th,
 .tickets-table td {
-  padding: 0.75rem;
+  padding: 1rem;
   text-align: left;
   border-bottom: 1px solid #e5e7eb;
 }
 
 .tickets-table th {
-  background: #f3f4f6;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
   font-weight: 600;
-  color: #374151;
   font-size: 0.875rem;
 }
 
 .tickets-table td {
-  color: #6b7280;
+  color: #4b5563;
   font-size: 0.875rem;
 }
 
@@ -955,21 +1035,29 @@ onMounted(() => {
   border-bottom: none;
 }
 
+.tickets-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.tickets-table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
 .status-badge {
   display: inline-block;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
+  padding: 0.375rem 0.75rem;
+  border-radius: 20px;
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .status-badge.activo {
-  background: #dbeafe;
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
   color: #2563eb;
 }
 
 .status-badge.finalizado {
-  background: #d1fae5;
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
   color: #059669;
 }
 </style>
