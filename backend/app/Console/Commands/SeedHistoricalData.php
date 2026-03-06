@@ -7,10 +7,11 @@ use Illuminate\Console\Command;
 class SeedHistoricalData extends Command
 {
     protected $signature = 'db:seed-historical 
+                            {--january : Seed January 2026}
                             {--february : Seed February 2026}
                             {--march : Seed March 2026}
-                            {--june : Seed June 2026}
-                            {--all : Seed all historical data (Feb, Mar, Jun)}';
+                            {--days= : Number of days to seed for March}
+                            {--all : Seed all historical data (Jan, Feb, Mar)}';
 
     protected $description = 'Seed database with historical test data';
 
@@ -20,25 +21,32 @@ class SeedHistoricalData extends Command
         $seeder->setCommand($this);
 
         $seedAll = $this->option('all');
+        $seedJan = $this->option('january');
         $seedFeb = $this->option('february');
         $seedMar = $this->option('march');
-        $seedJun = $this->option('june');
+        $days = $this->option('days');
 
-        if ($seedAll || (!$seedFeb && !$seedMar && !$seedJun)) {
-            $this->info('Seeding all historical data (February, March, June 2026)...');
+        if ($seedAll) {
+            $this->info('Seeding all historical data (January, February, March 2026)...');
+            $seeder->seedJanuary2026();
             $seeder->seedFebruary2026();
             $seeder->seedMarch2026();
-            $seeder->seedJune2026();
-        } else {
+        } elseif ($seedJan || $seedFeb || $seedMar) {
+            if ($seedJan) {
+                $this->info('Seeding January 2026...');
+                $seeder->seedJanuary2026();
+            }
             if ($seedFeb) {
+                $this->info('Seeding February 2026...');
                 $seeder->seedFebruary2026();
             }
             if ($seedMar) {
-                $seeder->seedMarch2026();
+                $this->info('Seeding March 2026...' . ($days ? " (first $days days)" : ""));
+                $seeder->seedMarch2026($days ? (int)$days : null);
             }
-            if ($seedJun) {
-                $seeder->seedJune2026();
-            }
+        } else {
+            $this->info('Seeding March 2026 (first 5 days)...');
+            $seeder->seedMarch2026(5);
         }
 
         $totalTickets = \App\Models\Ticket::count();

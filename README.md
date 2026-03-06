@@ -692,7 +692,7 @@ El proyecto se desarrolló en 13 fases progresivas, comenzando con la configurac
 
 El proyecto incluye un seeder integrado en `DatabaseSeeder` que genera datos realistas para meses históricos:
 
-- **Meses disponibles**: Febrero, Marzo, Junio 2026
+- **Meses disponibles**: Enero, Febrero, Marzo 2026
 - ~20-50 tickets por día por mes
 - 5-15 tickets activos por día
 - Distribución realista de tipos de vehículo (auto/moto/camioneta)
@@ -705,13 +705,13 @@ El proyecto incluye un seeder integrado en `DatabaseSeeder` que genera datos rea
 # Ejecutar solo datos básicos (usuarios y espacios)
 docker compose exec backend php artisan migrate:fresh --seed
 
-# Seedear todos los datos históricos (Febrero, Marzo, Junio 2026)
+# Seedear todos los datos históricos (Enero, Febrero, Marzo 2026)
 docker compose exec backend php artisan db:seed-historical --all
 
 # Seedear solo un mes específico
+docker compose exec backend php artisan db:seed-historical --january
 docker compose exec backend php artisan db:seed-historical --february
 docker compose exec backend php artisan db:seed-historical --march
-docker compose exec backend php artisan db:seed-historical --june
 ```
 
 ---
@@ -761,8 +761,13 @@ docker compose exec backend php artisan migrate
 # Refrescar base de datos
 docker compose exec backend php artisan migrate:fresh --seed
 
-# Seedear datos de Junio 2026 (tickets y pagos)
-docker compose exec backend php artisan db:seed --class=June2026Seeder
+# Seedear datos históricos (Enero, Febrero, Marzo 2026)
+docker compose exec backend php artisan db:seed-historical --all
+
+# Seedear un mes específico
+docker compose exec backend php artisan db:seed-historical --january
+docker compose exec backend php artisan db:seed-historical --february
+docker compose exec backend php artisan db:seed-historical --march
 
 # Acceder al contenedor backend
 docker compose exec backend sh

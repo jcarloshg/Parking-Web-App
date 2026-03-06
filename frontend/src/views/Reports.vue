@@ -359,7 +359,7 @@ const handleLogout = async () => {
 
 const activeTab = ref<"daily" | "monthly">("daily");
 
-const dailyDate = ref(new Date().toISOString().split("T")[0]);
+const dailyDate = ref(new Date().toISOString().split('T')[0]);
 const dailyLoading = ref(false);
 const dailyError = ref("");
 const dailyReport = ref<any>(null);
@@ -411,15 +411,6 @@ const formatDateTime = (dateStr: string) => {
   });
 };
 
-const getVehicleIcon = (type: string) => {
-  const icons: Record<string, string> = {
-    auto: "🚗",
-    moto: "🏍️",
-    camioneta: "🚐",
-  };
-  return icons[type] || "🚙";
-};
-
 const getVehicleName = (type: string) => {
   const names: Record<string, string> = {
     auto: "Auto",
@@ -466,22 +457,38 @@ const dailyVehicleChartData = computed(() => {
   }
 
   const data = dailyReport.value.tipos_vehiculo;
-  const labels = Object.keys(data).map((key) => {
-    const labels: Record<string, string> = {
-      auto: "Automóvil 🚗",
-      moto: "Motocicleta 🏍️",
-      camioneta: "Camioneta 🚐",
-    };
-    return labels[key] || key;
-  });
   const values = Object.values(data).map((v) => Number(v) || 0);
+  const total = values.reduce((a, b) => a + b, 0);
+
+  const labels = Object.keys(data).map((key, index) => {
+    const nameMap: Record<string, string> = {
+      auto: "Automóvil",
+      moto: "Motocicleta",
+      camioneta: "Camioneta",
+    };
+    const name = nameMap[key] || key;
+    const value = values[index] ?? 0;
+    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
+    return `${name} (${percentage}%)`;
+  });
 
   return {
     labels,
     datasets: [
       {
-        backgroundColor: ["#3b82f6", "#10b981", "#f59e0b"],
+        backgroundColor: [
+          'rgba(59, 130, 246, 0.85)',
+          'rgba(16, 185, 129, 0.85)',
+          'rgba(245, 158, 11, 0.85)',
+        ],
+        borderColor: [
+          '#3b82f6',
+          '#10b981',
+          '#f59e0b',
+        ],
+        borderWidth: 2,
         data: values,
+        hoverOffset: 8,
       },
     ],
   };
@@ -514,22 +521,38 @@ const vehicleChartData = computed(() => {
   }
 
   const data = monthlyReport.value.tipo_vehiculo_frecuente;
-  const labels = Object.keys(data).map((key) => {
-    const labels: Record<string, string> = {
+  const values = Object.values(data).map((v) => Number(v) || 0);
+  const total = values.reduce((a, b) => a + b, 0);
+
+  const labels = Object.keys(data).map((key, index) => {
+    const nameMap: Record<string, string> = {
       auto: "Automóvil",
       moto: "Motocicleta",
       camioneta: "Camioneta",
     };
-    return labels[key] || key;
+    const name = nameMap[key] || key;
+    const value = values[index] ?? 0;
+    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
+    return `${name} (${percentage}%)`;
   });
-  const values = Object.values(data).map((v) => Number(v) || 0);
 
   return {
     labels,
     datasets: [
       {
-        backgroundColor: ["#3b82f6", "#10b981", "#f59e0b"],
+        backgroundColor: [
+          'rgba(59, 130, 246, 0.85)',
+          'rgba(16, 185, 129, 0.85)',
+          'rgba(245, 158, 11, 0.85)',
+        ],
+        borderColor: [
+          '#3b82f6',
+          '#10b981',
+          '#f59e0b',
+        ],
+        borderWidth: 2,
         data: values,
+        hoverOffset: 8,
       },
     ],
   };
@@ -553,6 +576,30 @@ const barOptions = {
 const pieOptions = {
   responsive: true,
   maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      position: 'bottom' as const,
+      labels: {
+        padding: 20,
+        font: {
+          size: 14,
+        },
+        usePointStyle: true,
+        pointStyle: 'circle' as const,
+      },
+    },
+    tooltip: {
+      callbacks: {
+        label: (context: any) => {
+          const label = context.label || '';
+          const value = context.raw || 0;
+          const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
+          const percentage = ((value / total) * 100).toFixed(1);
+          return `${label}: ${value} (${percentage}%)`;
+        },
+      },
+    },
+  },
 };
 
 onMounted(() => {
@@ -751,9 +798,15 @@ onMounted(() => {
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
   margin-bottom: 2rem;
+}
+
+@media (max-width: 640px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .stat-card {
@@ -789,18 +842,23 @@ onMounted(() => {
 }
 
 .chart-container {
-  background: #f9fafb;
-  border-radius: 8px;
-  padding: 1rem;
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
 }
 
 .chart-container h3 {
   margin: 0 0 1rem;
   text-align: center;
+  color: #1f2937;
+  font-weight: 600;
+  font-size: 1.1rem;
 }
 
 .chart-container canvas {
-  max-height: 250px;
+  max-height: 300px;
 }
 
 .no-data {

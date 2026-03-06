@@ -37,9 +37,9 @@ class DatabaseSeeder extends Seeder
         $this->seedParkingSpaces();
 
         if ($includeHistoricalData || env('SEED_HISTORICAL_DATA', false)) {
+            $this->seedJanuary2026();
             $this->seedFebruary2026();
             $this->seedMarch2026();
-            $this->seedJune2026();
         }
     }
 
@@ -90,22 +90,22 @@ class DatabaseSeeder extends Seeder
         }
     }
 
-    public function seedFebruary2026(): void
+    public function seedJanuary2026(?int $days = null): void
     {
-        $this->seedMonth(2026, 2, 'February');
+        $this->seedMonth(2026, 1, 'January', $days);
     }
 
-    public function seedMarch2026(): void
+    public function seedFebruary2026(?int $days = null): void
     {
-        $this->seedMonth(2026, 3, 'March');
+        $this->seedMonth(2026, 2, 'February', $days);
     }
 
-    public function seedJune2026(): void
+    public function seedMarch2026(?int $days = null): void
     {
-        $this->seedMonth(2026, 6, 'June');
+        $this->seedMonth(2026, 3, 'March', $days);
     }
 
-    private function seedMonth(int $year, int $month, string $monthName): void
+    private function seedMonth(int $year, int $month, string $monthName, ?int $days = null): void
     {
         $users = User::whereIn('role', ['admin', 'cajero', 'supervisor'])->get();
         $spaces = ParkingSpace::all();
@@ -123,7 +123,7 @@ class DatabaseSeeder extends Seeder
             $this->command->info("Seeding $monthName $year data...");
         }
 
-        $daysInMonth = Carbon::create($year, $month)->daysInMonth;
+        $daysInMonth = $days ?? Carbon::create($year, $month)->daysInMonth;
         $endDate = Carbon::create($year, $month, $daysInMonth, 23, 59, 59);
 
         for ($day = 1; $day <= $daysInMonth; $day++) {
