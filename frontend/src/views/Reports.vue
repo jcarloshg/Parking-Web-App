@@ -248,7 +248,7 @@ const loadDailyReport = async () => {
   dailyError.value = ''
   try {
     const response = await reportsApi.getDaily(dailyDate.value)
-    dailyReport.value = response.data.data
+    dailyReport.value = response.data
   } catch (err: any) {
     dailyError.value = err.response?.data?.message || 'Error al cargar el reporte'
   } finally {
@@ -261,7 +261,7 @@ const loadMonthlyReport = async () => {
   monthlyError.value = ''
   try {
     const response = await reportsApi.getMonthly(monthlyYear.value, monthlyMonth.value)
-    monthlyReport.value = response.data.data
+    monthlyReport.value = response.data
   } catch (err: any) {
     monthlyError.value = err.response?.data?.message || 'Error al cargar el reporte'
   } finally {
