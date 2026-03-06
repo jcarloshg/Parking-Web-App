@@ -22,12 +22,37 @@ class ReportService
         $cajonesDisponibles = ParkingSpace::where('status', 'disponible')->count();
         $ticketsActivos = Ticket::where('status', 'activo')->count();
 
+        $ticketsDelDia = Ticket::whereDate('entry_time', $date)
+            ->with(['parkingSpace', 'payment'])
+            ->orderBy('entry_time', 'desc')
+            ->get();
+
+        $tiposVehiculo = $ticketsDelDia->groupBy('vehicle_type')
+            ->map(fn ($group) => $group->count())
+            ->toArray();
+
+        $ticketsList = $ticketsDelDia->map(function ($ticket) {
+            return [
+                'id' => $ticket->id,
+                'plate_number' => $ticket->plate_number,
+                'vehicle_type' => $ticket->vehicle_type,
+                'entry_time' => $ticket->entry_time,
+                'exit_time' => $ticket->exit_time,
+                'parking_space' => $ticket->parkingSpace?->number,
+                'status' => $ticket->status,
+                'total' => $ticket->payment?->total ?? null,
+                'payment_method' => $ticket->payment?->payment_method ?? null,
+            ];
+        });
+
         return [
             'total_ingresos' => $totalIngresos,
             'tickets_atendidos' => $ticketsAtendidos,
             'promedio_por_ticket' => round($promedioPorTicket, 2),
             'cajones_disponibles' => $cajonesDisponibles,
             'tickets_activos' => $ticketsActivos,
+            'tipos_vehiculo' => $tiposVehiculo,
+            'tickets' => $ticketsList,
             'fecha' => $date,
         ];
     }
