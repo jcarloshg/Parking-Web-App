@@ -39,16 +39,6 @@ Sistema de gestión de estacionamiento con Laravel, Vue.js y MySQL.
 
 A continuación se presenta una evidencia visual de las principales funcionalidades del sistema:
 
-| Vista | Descripción |
-|-------|-------------|
-| **Dashboard** | Panel principal con estadísticas, grid de cajones y últimos tickets |
-| **Entrada** | Formulario para registrar vehículos entrantes |
-| **Salida** | Búsqueda por placa y procesamiento de pago |
-| **Reportes Diarios** | Resumen de ingresos y tickets del día |
-| **Reportes Mensuales** | Estadísticas mensuales con gráficos |
-| **Gestión de Espacios** | CRUD de cajones de estacionamiento |
-| **Administración de Usuarios** | Gestión de usuarios del sistema |
-
 ### Dashboard (Admin)
 
 Vista principal del dashboard donde se muestran las estadísticas en tiempo real, el estado de los cajones de estacionamiento y los últimos tickets activos.
