@@ -259,6 +259,7 @@ const handlePayment = async () => {
     })
     paymentData.value = response.data.data
     paymentSuccess.value = true
+    router.push('/dashboard')
   } catch (err: unknown) {
     console.error('Error processing payment:', err)
     const axiosError = err as { response?: { data?: { message?: string } } }
